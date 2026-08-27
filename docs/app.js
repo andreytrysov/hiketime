@@ -315,6 +315,7 @@ function endStroke(){
   S.history.push(before);
   if (S.history.length > 40) S.history.shift();
   S.savedId = null;              // маршрут изменился — состояние «сохранено» снято
+  if (what === 'участок заменён') toast('Участок заменён новой линией');
   recompute();
 }
 
@@ -364,9 +365,32 @@ window.addEventListener('mouseup', () => { if (S.draw && cur) endStroke(); }, {c
 // ---------- высоты ----------
 /* Локально — наш сервер по тайлам terrarium. На статическом хостинге его нет,
    падаем на Open-Meteo: единственный бесплатный источник с CORS. */
-const ELEV = { local: null };
+const ELEV = { local: null, cache: new Map() };
+const elevKey = ([lng, lat]) => lat.toFixed(5) + ',' + lng.toFixed(5);
 
+/* Кэш высот: при правке маршрута заново запрашиваются только новые точки —
+   без этого каждый мазок молотил по API целым маршрутом, и Open-Meteo
+   начинал отбивать запросы. */
 async function fetchElev(pts){
+  const out = new Array(pts.length);
+  const missing = [], at = [];
+  pts.forEach((p, i) => {
+    const k = elevKey(p);
+    if (ELEV.cache.has(k)) out[i] = ELEV.cache.get(k);
+    else { missing.push(p); at.push(i); }
+  });
+  if (missing.length){
+    const got = await fetchElevRaw(missing);
+    got.forEach((v, j) => {
+      out[at[j]] = v;
+      ELEV.cache.set(elevKey(missing[j]), v);
+    });
+    if (ELEV.cache.size > 30000) ELEV.cache.clear();
+  }
+  return out;
+}
+
+async function fetchElevRaw(pts){
   if (ELEV.local !== false){
     try {
       const r = await fetch('/elev', {method:'POST',
@@ -401,7 +425,14 @@ async function recompute(){
     S.busy = false;
     console.error('высоты не получены', err);
     // молчать нельзя: иначе цифры и цвет тихо отстают от нарисованного
-    toast('Не удалось получить высоты — цифры не обновились. Попробуйте ещё раз.');
+    if ((S.elevRetries || 0) < 2){
+      S.elevRetries = (S.elevRetries || 0) + 1;
+      toast('Высоты не пришли — пробую ещё раз…');
+      const snapshot = S.path;
+      setTimeout(() => { if (S.path === snapshot) recompute(); }, 2600 * S.elevRetries);
+    } else {
+      toast('Сервис высот недоступен — цифры не обновились');
+    }
     return;
   }
 
@@ -419,6 +450,7 @@ async function recompute(){
     ...(([g,l]) => ({gain:g, loss:l}))(gainLoss(sm))
   });
   S.busy = false;
+  S.elevRetries = 0;
   render();
   // после первой нарисованной линии настройки веса всплывают сами
   if (SHEET.pos === 'hidden') sheetTo('half');
