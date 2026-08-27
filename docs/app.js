@@ -664,20 +664,8 @@ bUndo.onclick = () => {
   S.path.length > 1 ? recompute() : clearRoute();
 };
 bSave.onclick = () => saveCurrent();
-let clearArm = null;
 bClear.onclick = () => {
-  if (clearArm){
-    clearTimeout(clearArm); clearArm = null;
-    bClear.style.background = ''; bClear.style.color = '';
-    clearRoute();
-    return;
-  }
-  bClear.style.background = '#a33a2a'; bClear.style.color = '#fff';
-  toast('Ещё раз — стереть маршрут целиком');
-  clearArm = setTimeout(() => {
-    clearArm = null;
-    bClear.style.background = ''; bClear.style.color = '';
-  }, 2600);
+  if (confirm('Стереть нарисованный маршрут?')) clearRoute();
 };
 
 // ---------- вес и темп ----------
@@ -754,13 +742,9 @@ function renderRoutes(){
   if (sh) sh.onclick = shareRoute;
   routesEl.querySelectorAll('.rx').forEach(x => x.onclick = e => {
     e.stopPropagation();
-    // удаление в два касания: первое взводит, второе удаляет
-    if (!x.classList.contains('arm')){
-      x.classList.add('arm');
-      setTimeout(() => x.classList.remove('arm'), 2600);
-      return;
-    }
-    persistRoutes(loadRoutes().filter(o => o.id !== +x.dataset.del));
+    const o = loadRoutes().find(q => q.id === +x.dataset.del);
+    if (!confirm(`Удалить «${o ? o.name : 'маршрут'}»?`)) return;
+    persistRoutes(loadRoutes().filter(q => q.id !== +x.dataset.del));
     renderRoutes();
   });
   routesEl.querySelectorAll('.row[data-id]').forEach(r => r.onclick = () => {
