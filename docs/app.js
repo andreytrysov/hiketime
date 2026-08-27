@@ -30,8 +30,6 @@ function haversine(a, b){
   const s = Math.sin(dLat/2)**2 + Math.cos(rad(a[1]))*Math.cos(rad(b[1]))*Math.sin(dLon/2)**2;
   return 2*R*Math.asin(Math.sqrt(s));
 }
-/* Упрощение в экранных пикселях: допуск сам подстраивается под зум,
-   как и договаривались — на дальнем зуме грубее, на ближнем точнее. */
 function simplifyPx(pts, tol){
   if (pts.length < 3) return pts;
   const d2 = (p, a, b) => {
@@ -79,7 +77,7 @@ function gainLoss(ele, thr=2){
 // ---------- состояние ----------
 const S = {
   path: [], history: [], pts: [], ele: [], segs: [],
-  dist: 0, gain: 0, loss: 0,
+  dist: 0, gain: 0, loss: 0, sens: 0,
   body: +(localStorage.getItem('body') || 75),
   load: +(localStorage.getItem('load') || 10),
   power: 3.6, draw: false, busy: false,
@@ -111,7 +109,6 @@ const map = new maplibregl.Map({
   }
 });
 map.addControl(new maplibregl.NavigationControl({showCompass:false}), 'bottom-left');
-
 map.on('error', e => console.error('MAPERR', e && e.error && e.error.message));
 
 let layersReady = false;
@@ -120,7 +117,9 @@ function addRouteLayers(){
   if (map.getSource('route')) { layersReady = true; return; }
   layersReady = true;
   map.addSource('route', { type:'geojson', data:{type:'FeatureCollection',features:[]} });
-  map.addSource('segs',  { type:'geojson', data:{type:'FeatureCollection',features:[]} });
+  // отдельный источник для скорости: lineMetrics нужен градиенту вдоль линии
+  map.addSource('spd',   { type:'geojson', lineMetrics:true,
+    data:{type:'FeatureCollection',features:[]} });
   map.addSource('cur',   { type:'geojson', data:{type:'FeatureCollection',features:[]} });
   map.addSource('ends',  { type:'geojson', data:{type:'FeatureCollection',features:[]} });
 
@@ -130,11 +129,9 @@ function addRouteLayers(){
   map.addLayer({ id:'route-line', type:'line', source:'route',
     paint:{'line-color':'#2f6f4f','line-width':4},
     layout:{'line-cap':'round','line-join':'round'} });
-  map.addLayer({ id:'route-spd', type:'line', source:'segs',
-    layout:{visibility:'none','line-cap':'round'},
-    paint:{'line-width':5,'line-color':
-      ['interpolate',['linear'],['get','v'],
-        0.3,'#a33a2a', 0.7,'#d9a05b', 1.1,'#c9c07a', 1.4,'#2f6f4f']} });
+  map.addLayer({ id:'route-spd', type:'line', source:'spd',
+    layout:{visibility:'none','line-cap':'round','line-join':'round'},
+    paint:{'line-width':5} });
   map.addLayer({ id:'end-pt', type:'circle', source:'ends',
     paint:{'circle-radius':5.5,'circle-color':'#2f6f4f',
            'circle-stroke-color':'#fff','circle-stroke-width':2.5} });
@@ -143,8 +140,41 @@ function addRouteLayers(){
   applyLayers();
 }
 map.on('load', addRouteLayers);
-// подстраховка: 'load' ждёт первой отрисовки тайлов и при медленной сети может не прийти
 map.on('styledata', () => { if (map.isStyleLoaded()) addRouteLayers(); });
+
+/* isStyleLoaded() бывает false на уже готовом стиле, а событие idle может
+   проскочить до подписки — поэтому просто пробуем и повторяем по таймеру. */
+function whenReady(fn, tries = 25){
+  try { fn(); } catch(e){
+    if (tries > 0) setTimeout(() => whenReady(fn, tries - 1), 400);
+    else console.error('whenReady сдался:', e.message);
+  }
+}
+
+/* Правила слоёв: подложка — одна из трёх; горизонтали поверх топо не имеют
+   смысла (это те же тайлы), поэтому там пункт гаснет; цвет по скорости —
+   режим отображения маршрута, он заменяет зелёную линию. */
+function applyLayers(){
+  const contoursOn = S.contours && S.base !== 'topo';
+  whenReady(() => {
+    const vis = on => on ? 'visible' : 'none';
+    map.setLayoutProperty('l-topo',  'visibility', vis(S.base === 'topo'));
+    map.setLayoutProperty('l-plain', 'visibility', vis(S.base === 'plain'));
+    map.setLayoutProperty('l-sat',   'visibility', vis(S.base === 'sat'));
+    map.setLayoutProperty('l-cont',  'visibility', vis(contoursOn));
+    if (map.getLayer('route-spd')){
+      map.setLayoutProperty('route-spd',  'visibility', vis(S.speedColor));
+      map.setLayoutProperty('route-line', 'visibility', vis(!S.speedColor));
+    }
+  });
+  document.querySelectorAll('#layers .row[data-base]').forEach(r =>
+    r.classList.toggle('sel', r.dataset.base === S.base));
+  const cont = document.querySelector('#layers .row[data-ov="contours"]');
+  cont.classList.toggle('sel', contoursOn);
+  cont.classList.toggle('dis', S.base === 'topo');
+  document.querySelector('#layers .row[data-ov="speed"]')
+    .classList.toggle('sel', S.speedColor);
+}
 
 // ---------- жесты рисования: один палец рисует, два двигают карту ----------
 const el = map.getCanvasContainer();
@@ -154,20 +184,20 @@ function beginStroke(x, y){ cur = [[x, y]]; }
 function extendStroke(x, y){
   if (!cur) return;
   const p = cur[cur.length-1];
-  if ((x-p[0])**2 + (y-p[1])**2 > 4) cur.push([x, y]);   // не копим дрожь пальца
+  if ((x-p[0])**2 + (y-p[1])**2 > 4) cur.push([x, y]);
   drawPreview();
 }
-const SNAP_PX = 45;   // насколько близко мазок должен подойти, чтобы приклеиться
 
-/* Проекция точки на отрезок: доля вдоль него и расстояние. */
+const SNAP_PX = 45;
+
 function projOnSeg(p, a, b){
   const dx = b[0]-a[0], dy = b[1]-a[1], L = dx*dx + dy*dy;
   let t = L ? ((p[0]-a[0])*dx + (p[1]-a[1])*dy)/L : 0;
   t = Math.max(0, Math.min(1, t));
   return {t, d: Math.hypot(p[0] - (a[0]+dx*t), p[1] - (a[1]+dy*t))};
 }
-/* Ближайшее место на ломаной. Мерить до вершин нельзя: после упрощения
-   прямой участок — это две точки, и правка в его середине не находится. */
+/* Мерить близость надо до отрезков, не до вершин: после упрощения прямой
+   участок — это две точки на пол-экрана. */
 function nearestOnPolyline(p, px){
   let best = {i:0, t:0, d:Infinity};
   for (let i = 0; i < px.length - 1; i++){
@@ -178,8 +208,8 @@ function nearestOnPolyline(p, px){
 }
 const lerpLL = (a, b, t) => [a[0] + (b[0]-a[0])*t, a[1] + (b[1]-a[1])*t];
 
-/* Куда девать новый мазок. Раньше он тупо дописывался в конец, из-за чего
-   между несвязанными штрихами возникали прямые перемычки через пол-карты. */
+/* Куда девать новый мазок: продление с ближайшего конца, правка
+   перечёркиванием, отклонение далёкого. */
 function applyStroke(strokePx){
   const stroke = strokePx.map(([x,y]) => { const c = map.unproject([x,y]); return [c.lng, c.lat]; });
   if (S.path.length < 2){ S.path = stroke; return 'начало'; }
@@ -189,7 +219,6 @@ function applyStroke(strokePx){
   const s0 = strokePx[0], s1 = strokePx[strokePx.length-1];
   const dist = (a, b) => Math.hypot(a[0]-b[0], a[1]-b[1]);
 
-  // 1. оба конца мазка легли на линию — это правка, заменяем участок между ними
   const a = nearestOnPolyline(s0, pathPx), b = nearestOnPolyline(s1, pathPx);
   if (a.d < SNAP_PX && b.d < SNAP_PX){
     const [p1, p2, seg] = (a.i + a.t) <= (b.i + b.t)
@@ -200,7 +229,6 @@ function applyStroke(strokePx){
     return 'участок заменён';
   }
 
-  // 2. иначе продлеваем от того конца маршрута, к которому мазок ближе
   const opts = [
     {d: dist(s0, tail), at:'tail', add: stroke},
     {d: dist(s1, tail), at:'tail', add: stroke.slice().reverse()},
@@ -208,7 +236,7 @@ function applyStroke(strokePx){
     {d: dist(s1, head), at:'head', add: stroke}
   ].sort((x, y) => x.d - y.d)[0];
 
-  if (opts.d > SNAP_PX) return null;              // далеко от всего — не приклеиваем
+  if (opts.d > SNAP_PX) return null;
   S.path = opts.at === 'head' ? opts.add.concat(S.path) : S.path.concat(opts.add);
   return 'продлено';
 }
@@ -221,7 +249,7 @@ function endStroke(){
   cur = null;
   if (!what){
     drawPreview();
-    flash('Мазок далеко от маршрута — начните у его конца или поверх линии');
+    toast('Мазок далеко от маршрута — начните у его конца или поверх линии');
     return;
   }
   S.history.push(before);
@@ -229,15 +257,6 @@ function endStroke(){
   recompute();
 }
 
-let flashTimer = null;
-function flash(msg){
-  hint.textContent = msg;
-  clearTimeout(flashTimer);
-  flashTimer = setTimeout(() => {
-    hint.textContent = S.draw ? 'Один палец рисует, два — двигают карту'
-                              : 'Тяните слайдер — время пересчитается';
-  }, 2600);
-}
 function drawPreview(){
   const feats = [];
   if (S.path.length > 1) feats.push({type:'Feature',geometry:{type:'LineString',coordinates:S.path}});
@@ -247,7 +266,6 @@ function drawPreview(){
   }
   whenReady(() => {
     map.getSource('route').setData({type:'FeatureCollection',features:feats});
-    // концы маршрута видно — сразу понятно, откуда его продолжать
     const ends = S.path.length > 1 ? [S.path[0], S.path[S.path.length-1]] : [];
     map.getSource('ends').setData({type:'FeatureCollection',
       features: ends.map(c => ({type:'Feature',geometry:{type:'Point',coordinates:c}}))});
@@ -262,7 +280,7 @@ function localXY(e, t){
 el.addEventListener('touchstart', e => {
   if (!S.draw) return;
   if (e.touches.length === 1){ e.stopPropagation(); e.preventDefault(); beginStroke(...localXY(e, e.touches[0])); }
-  else { cur = null; drawPreview(); }          // два пальца — отдаём карте
+  else { cur = null; drawPreview(); }
 }, {capture:true, passive:false});
 el.addEventListener('touchmove', e => {
   if (!S.draw || !cur) return;
@@ -273,7 +291,6 @@ el.addEventListener('touchend', e => {
   if (!S.draw || !cur) return;
   e.stopPropagation(); endStroke();
 }, {capture:true, passive:false});
-// мышь — чтобы можно было пробовать с ноутбука
 el.addEventListener('mousedown', e => {
   if (!S.draw) return; e.stopPropagation(); e.preventDefault(); beginStroke(...localXY(e));
 }, {capture:true});
@@ -283,10 +300,8 @@ el.addEventListener('mousemove', e => {
 window.addEventListener('mouseup', () => { if (S.draw && cur) endStroke(); }, {capture:true});
 
 // ---------- высоты ----------
-/* Локально их считает наш сервер по тем же тайлам, что и первый прототип.
-   На статическом хостинге сервера нет, поэтому падаем на Open-Meteo:
-   он единственный из бесплатных отдаёт высоты с заголовками CORS.
-   Цифры чуть разойдутся — у него другой DEM. */
+/* Локально — наш сервер по тайлам terrarium. На статическом хостинге его нет,
+   падаем на Open-Meteo: единственный бесплатный источник с CORS. */
 const ELEV = { local: null };
 
 async function fetchElev(pts){
@@ -316,15 +331,18 @@ async function recompute(){
   if (path.length < 2){ clearRoute(); return; }
   S.lastLen = path.reduce((sum, p, i, a) => i ? sum + haversine(a[i-1], p) : 0, 0);
   S.busy = true;
-  // На статическом хостинге высоты берём из Open-Meteo, там реже точки:
-  // у него лимит 100 координат на запрос, не хочется долбить его сотнями.
   const step = ELEV.local === false ? Math.max(25, S.lastLen/450) : 25;
   const pts = resample(path, step);
   let ele;
   try { ele = await fetchElev(pts); }
-  catch(err){ S.busy = false; console.error('высоты не получены', err); return; }
+  catch(err){
+    S.busy = false;
+    console.error('высоты не получены', err);
+    // молчать нельзя: иначе цифры и цвет тихо отстают от нарисованного
+    toast('Не удалось получить высоты — цифры не обновились. Попробуйте ещё раз.');
+    return;
+  }
 
-  // сглаживание профиля: без него шум DEM раздувает набор
   const sm = ele.map((_, i, a) => {
     const lo = Math.max(0, i-2), hi = Math.min(a.length, i+3);
     return a.slice(lo, hi).reduce((s,v)=>s+v,0)/(hi-lo);
@@ -344,19 +362,19 @@ async function recompute(){
 
 function clearRoute(){
   Object.assign(S, {path:[], history:[], pts:[], ele:[], segs:[], dist:0, gain:0, loss:0});
-  map.getSource('route')?.setData({type:'FeatureCollection',features:[]});
-  map.getSource('segs')?.setData({type:'FeatureCollection',features:[]});
-  map.getSource('cur')?.setData({type:'FeatureCollection',features:[]});
-  map.getSource('ends')?.setData({type:'FeatureCollection',features:[]});
+  whenReady(() => {
+    ['route','spd','cur','ends'].forEach(id =>
+      map.getSource(id)?.setData({type:'FeatureCollection',features:[]}));
+  });
   pill.classList.remove('on');
   bUndo.classList.remove('on'); bClear.classList.remove('on');
-  hint.textContent = 'Нажмите карандаш и обведите маршрут пальцем';
-  ['sDist','sGain','sLoss'].forEach(id => document.getElementById(id).textContent = '—');
+  ['sGain','sLoss','sPaceAvg'].forEach(id => document.getElementById(id).textContent = '—');
   document.getElementById('prof').innerHTML = '';
-  document.getElementById('sensVal').textContent = '—';
+  sheetTo('hidden');
+  updateEmptyHint();
 }
 
-// ---------- отрисовка ----------
+// ---------- шкала нагрузки ----------
 function loadBand(load, body){
   const p = load/body*100;
   if (p < 10)  return ['#2f6f4f', `${p.toFixed(0)}% массы тела — вес почти не мешает`];
@@ -366,14 +384,61 @@ function loadBand(load, body){
   return ['#a33a2a', `${p.toFixed(0)}% массы тела — так ходить не надо`];
 }
 
-/* Цветная шкала нагрузки: пороги в процентах от массы тела,
-   поэтому раскраска пересобирается под конкретного человека. */
-function paintBand(){
-  const max = +wSlider.max, b = S.body;
-  const at = pct => Math.max(0, Math.min(100, b*pct/100/max*100)).toFixed(1) + '%';
-  document.getElementById('band').style.background =
-    `linear-gradient(90deg,#7fae8e 0 ${at(10)},#c9c07a ${at(10)} ${at(20)},`+
-    `#d9a05b ${at(20)} ${at(25)},#c4705c ${at(25)} ${at(30)},#a33a2a ${at(30)} 100%)`;
+/* Слайдер красится сам: заполненная часть — цветом зоны. Отдельной
+   полосы-радуги больше нет, она читалась как второй слайдер. */
+function paintSlider(elm, pct, color){
+  elm.style.setProperty('--fill',
+    `linear-gradient(90deg, ${color} 0 ${pct}%, #e3e6ea ${pct}% 100%)`);
+}
+function paintTicks(){
+  const wrap = document.getElementById('ticks');
+  wrap.innerHTML = '';
+  [10, 20, 25, 30].forEach(p => {
+    const kg = S.body*p/100;
+    if (kg > +wSlider.max) return;
+    const i = document.createElement('i');
+    i.style.left = (kg / +wSlider.max * 100) + '%';
+    wrap.appendChild(i);
+  });
+}
+function updateWeightUI(){
+  document.getElementById('wVal').textContent = S.load + ' кг';
+  const [c, txt] = loadBand(S.load, S.body);
+  paintSlider(wSlider, S.load / +wSlider.max * 100, c);
+  const sens = S.segs.length ? ` · +${S.sens} мин/кг` : '';
+  statusLine.textContent = txt + sens;
+  statusLine.style.color = c;
+}
+
+// ---------- отрисовка ----------
+const zoneColor = v => v < 0.5 ? '#a33a2a' : v < 0.9 ? '#d9a05b' : v < 1.25 ? '#c9c07a' : '#2f6f4f';
+
+/* Скорость — одна непрерывная линия с градиентом, а не пачка кусочков по
+   25 м: кусочки на отдалении разваливались в штриховку. */
+function speedGradient(){
+  if (S.pts.length < 2 || !S.dist) return;
+  const stops = [];
+  const every = Math.max(1, Math.floor(S.segs.length/60));
+  let cum = 0, last = -1;
+  for (let i = 0; i < S.segs.length; i++){
+    const [d, dh] = S.segs[i];
+    if (i % every === 0 || i === S.segs.length-1){
+      const p = Math.min(1, (cum + d/2)/S.dist);
+      if (p > last + 1e-4){
+        stops.push(p, zoneColor(d > 0 ? speedOf(dh/d, S.body, S.load, S.power) : 1));
+        last = p;
+      }
+    }
+    cum += d;
+  }
+  if (stops.length < 4) return;
+  if (stops[0] !== 0){ stops.unshift(0, stops[1]); }
+  whenReady(() => {
+    map.setPaintProperty('route-spd', 'line-gradient',
+      ['interpolate', ['linear'], ['line-progress'], ...stops]);
+    map.getSource('spd').setData({type:'Feature',
+      geometry:{type:'LineString', coordinates:S.pts}});
+  });
 }
 
 function render(){
@@ -386,45 +451,44 @@ function render(){
   pNaive.textContent = fmtH(n);
   pSub.textContent = `${(S.dist/1000).toFixed(1)} км · ↑${Math.round(S.gain)} м · ↓${Math.round(S.loss)} м`;
   bUndo.classList.add('on'); bClear.classList.add('on');
-  hint.textContent = 'Тяните слайдер — время пересчитается';
 
-  sDist.textContent = (S.dist/1000).toFixed(1) + ' км';
   sGain.textContent = Math.round(S.gain) + ' м';
   sLoss.textContent = Math.round(S.loss) + ' м';
+  sPaceAvg.textContent = t > 0 ? (S.dist/1000/t).toFixed(1) + ' км/ч' : '—';
 
   const t1 = timeHours(segs, body, load+1, power);
-  document.getElementById('sensVal').textContent = `+${Math.round((t1-t)*60)} мин`;
-
-  const [c, txt] = loadBand(load, body);
-  bandTxt.textContent = txt; bandTxt.style.color = c;
-
-  // трек, раскрашенный по скорости
-  const feats = [];
-  for (let i = 1; i < S.pts.length; i++){
-    const [d, dh] = segs[i-1];
-    feats.push({ type:'Feature', properties:{ v: d>0 ? speedOf(dh/d, body, load, power) : 1 },
-      geometry:{ type:'LineString', coordinates:[S.pts[i-1], S.pts[i]] }});
-  }
-  whenReady(() => map.getSource('segs').setData({type:'FeatureCollection',features:feats}));
+  S.sens = Math.round((t1-t)*60);
+  updateWeightUI();
+  speedGradient();
   drawProfile();
+  updateEmptyHint();
 }
 
 function drawProfile(){
   const svg = document.getElementById('prof');
   const e = S.ele; if (e.length < 2){ svg.innerHTML = ''; return; }
-  const W = 340, H = 104, pad = 6;
+  const W = 340, H = 104, pt = 6, pb = 18;
   const lo = Math.min(...e), hi = Math.max(...e), span = Math.max(hi-lo, 1);
   const X = i => i/(e.length-1)*W;
-  const Y = v => H - pad - (v-lo)/span*(H-pad*2);
+  const Y = v => H - pb - (v-lo)/span*(H-pb-pt);
   const line = e.map((v,i) => `${i?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+
+  // километровые риски по низу — иначе у графика нет масштаба
+  const totalKm = S.dist/1000;
+  const stepKm = totalKm <= 6 ? 1 : totalKm <= 14 ? 2 : 5;
+  let ticks = '';
+  for (let k = stepKm; k < totalKm; k += stepKm){
+    const x = (k/totalKm*W).toFixed(1);
+    ticks += `<line x1="${x}" y1="${H-pb+2}" x2="${x}" y2="${H-pb+7}" stroke="#b6bcc4" stroke-width="1"/>` +
+             `<text x="${x}" y="${H-2}" font-size="8.5" fill="#8b939e" text-anchor="middle">${k}</text>`;
+  }
   svg.innerHTML =
-    `<path d="${line}L${W},${H}L0,${H}Z" fill="#2f6f4f" opacity=".13"/>` +
-    `<path d="${line}" fill="none" stroke="#2f6f4f" stroke-width="1.8"/>` +
+    `<path d="${line}L${W},${H-pb}L0,${H-pb}Z" fill="#2f6f4f" opacity=".13"/>` +
+    `<path d="${line}" fill="none" stroke="#2f6f4f" stroke-width="1.8"/>` + ticks +
     `<circle id="pdot" r="4" fill="#12161c" stroke="#fff" stroke-width="2" style="display:none"/>`;
   svg.dataset.lo = lo; svg.dataset.hi = hi;
 }
 
-// касание графика подсвечивает точку на карте — и наоборот доверие к цифрам
 const profEl = document.getElementById('prof');
 function profTouch(clientX){
   if (!S.ele.length) return;
@@ -432,34 +496,139 @@ function profTouch(clientX){
   const f = Math.max(0, Math.min(1, (clientX - r.left)/r.width));
   const i = Math.round(f*(S.ele.length-1));
   const dot = document.getElementById('pdot');
-  if (dot){ dot.setAttribute('cx', (i/(S.ele.length-1)*340).toFixed(1));
+  if (dot){
     const lo = +profEl.dataset.lo, hi = +profEl.dataset.hi;
-    dot.setAttribute('cy', (104-6-(S.ele[i]-lo)/Math.max(hi-lo,1)*(104-12)).toFixed(1));
-    dot.style.display = ''; }
-  map.getSource('cur')?.setData({type:'Feature',geometry:{type:'Point',coordinates:S.pts[i]}});
-  const km = (S.pts.slice(0,i+1).reduce((s,p,j,a)=> j? s+haversine(a[j-1],p):0, 0)/1000).toFixed(1);
+    const span = Math.max(hi-lo, 1);
+    dot.setAttribute('cx', (i/(S.ele.length-1)*340).toFixed(1));
+    dot.setAttribute('cy', (104-18-(S.ele[i]-lo)/span*(104-18-6)).toFixed(1));
+    dot.style.display = '';
+  }
+  whenReady(() => map.getSource('cur').setData({type:'Feature',
+    geometry:{type:'Point',coordinates:S.pts[i]}}));
+  const km = (i/(S.ele.length-1)*S.dist/1000).toFixed(1);
   document.getElementById('profTxt').textContent = `${km} км · ${Math.round(S.ele[i])} м`;
 }
 profEl.addEventListener('touchmove', e => { e.preventDefault(); profTouch(e.touches[0].clientX); }, {passive:false});
 profEl.addEventListener('touchstart', e => { e.preventDefault(); profTouch(e.touches[0].clientX); }, {passive:false});
 profEl.addEventListener('mousemove', e => profTouch(e.clientX));
 
-// ---------- органы управления ----------
+// ---------- элементы ----------
 const pill = document.getElementById('pill');
-const bUndo = document.getElementById('bUndo'), bClear = document.getElementById('bClear');
-const sheet = document.getElementById('sheet'), hint = document.getElementById('hint');
 const pTime = document.getElementById('pTime'), pNaive = document.getElementById('pNaive');
-const pSub = document.getElementById('pSub'), bandTxt = document.getElementById('bandTxt');
-const sDist = document.getElementById('sDist'), sGain = document.getElementById('sGain');
-const sLoss = document.getElementById('sLoss');
+const pSub = document.getElementById('pSub');
+const bUndo = document.getElementById('bUndo'), bClear = document.getElementById('bClear');
+const bDraw = document.getElementById('bDraw');
+const sheet = document.getElementById('sheet');
+const statusLine = document.getElementById('statusLine');
+const sGain = document.getElementById('sGain'), sLoss = document.getElementById('sLoss');
+const sPaceAvg = document.getElementById('sPaceAvg');
+const wSlider = document.getElementById('wSlider');
+const layersEl = document.getElementById('layers');
+const toastEl = document.getElementById('toast');
+const emptyHint = document.getElementById('emptyHint');
 
-document.getElementById('bDraw').onclick = function(){
+// ---------- тосты и пустое состояние ----------
+let toastTimer = null;
+function toast(msg, ms = 2800){
+  toastEl.textContent = msg;
+  toastEl.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('on'), ms);
+}
+function updateEmptyHint(){
+  emptyHint.classList.toggle('on', S.path.length < 2 && !S.draw);
+}
+
+// ---------- шторка: hidden / half / full ----------
+const SHEET = { pos: 'hidden' };
+function sheetPositions(){
+  const h = sheet.offsetHeight;
+  const inp = document.getElementById('inputs');
+  const halfVisible = inp.offsetTop + inp.offsetHeight + 6;
+  return { hidden: h + 30, half: Math.max(h - halfVisible, 0), full: 0, h };
+}
+function sheetTo(pos){
+  SHEET.pos = pos;
+  const p = sheetPositions();
+  sheet.style.transform = `translateY(${p[pos]}px)`;
+  if (pos !== 'hidden') closeLayers();
+  // кнопки рисования уезжают выше шторки, а в полной позиции прячутся
+  const visible = pos === 'hidden' ? 0 : p.h - p[pos];
+  [bDraw, bUndo, bClear].forEach(b => b.classList.toggle('tucked', pos === 'full'));
+  const base = visible ? visible + 14 : 96;
+  bDraw.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base}px)`;
+  bUndo.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base + 68}px)`;
+  bClear.style.bottom = `calc(env(safe-area-inset-bottom,0px) + ${base + 120}px)`;
+}
+window.addEventListener('resize', () => sheetTo(SHEET.pos));
+
+// перетаскивание за ручку + тап по ней переключает половину/полную
+const headEl = document.getElementById('sheetHead');
+let dragY = null, dragStart = 0;
+headEl.addEventListener('pointerdown', e => {
+  dragY = e.clientY;
+  dragStart = sheetPositions()[SHEET.pos];
+  sheet.classList.add('drag');
+  headEl.setPointerCapture(e.pointerId);
+});
+headEl.addEventListener('pointermove', e => {
+  if (dragY === null) return;
+  const p = sheetPositions();
+  let t = dragStart + (e.clientY - dragY);
+  t = Math.max(p.full, Math.min(p.hidden, t));
+  sheet.style.transform = `translateY(${t}px)`;
+});
+headEl.addEventListener('pointerup', e => {
+  if (dragY === null) return;
+  sheet.classList.remove('drag');
+  const moved = e.clientY - dragY;
+  dragY = null;
+  if (Math.abs(moved) < 6){ sheetTo(SHEET.pos === 'full' ? 'half' : 'full'); return; }
+  const p = sheetPositions();
+  const t = dragStart + moved;
+  const cands = [['full', p.full], ['half', p.half]];
+  if (t > p.half + 70) cands.push(['hidden', p.hidden]);
+  cands.sort((a, b) => Math.abs(a[1]-t) - Math.abs(b[1]-t));
+  sheetTo(cands[0][0]);
+});
+
+pill.onclick = () => sheetTo(SHEET.pos === 'hidden' ? 'half' : 'hidden');
+
+// ---------- слои ----------
+function closeLayers(){
+  layersEl.classList.remove('on');
+  pill.style.visibility = '';
+}
+document.getElementById('bLayers').onclick = () => {
+  if (layersEl.classList.contains('on')) return closeLayers();
+  layersEl.classList.add('on');
+  pill.style.visibility = 'hidden';   // иначе меню ложится поверх плашки
+};
+document.querySelectorAll('#layers .row').forEach(row => row.onclick = () => {
+  if (row.dataset.base){
+    S.base = row.dataset.base;
+  } else if (row.dataset.ov === 'contours'){
+    if (S.base === 'topo'){ toast('На топокарте горизонтали уже есть'); return; }
+    S.contours = !S.contours;
+  } else {
+    S.speedColor = !S.speedColor;
+    if (S.speedColor && S.segs.length) speedGradient();
+  }
+  applyLayers();
+});
+
+// ---------- рисование ----------
+bDraw.onclick = function(){
   S.draw = !S.draw;
   this.classList.toggle('on', S.draw);
   map.dragPan[S.draw ? 'disable' : 'enable']();
-  hint.textContent = S.draw
-    ? 'Один палец рисует, два — двигают карту'
-    : (S.segs.length ? 'Тяните слайдер — время пересчитается' : 'Нажмите карандаш и обведите маршрут пальцем');
+  if (S.draw){
+    sheetTo('hidden');
+    toast('Один палец рисует, два — двигают карту');
+  } else if (S.path.length > 1){
+    sheetTo('half');
+  }
+  updateEmptyHint();
 };
 bUndo.onclick = () => {
   if (!S.history.length) return clearRoute();
@@ -469,57 +638,18 @@ bUndo.onclick = () => {
 };
 bClear.onclick = () => clearRoute();
 
-/* Слои переключаем только по готовому стилю: иначе setLayoutProperty бросает
-   'Style is not done loading' и карта остаётся пустой. */
-/* isStyleLoaded() у MapLibre бывает false на уже готовом стиле,
-   поэтому просто пробуем и повторяем по следующему событию. */
-function whenReady(fn){
-  try { fn(); } catch(e){ map.once('idle', () => whenReady(fn)); }
-}
-function applyLayers(){
-  whenReady(() => {
-    const vis = on => on ? 'visible' : 'none';
-    map.setLayoutProperty('l-topo',  'visibility', vis(S.base === 'topo'));
-    map.setLayoutProperty('l-plain', 'visibility', vis(S.base === 'plain'));
-    map.setLayoutProperty('l-sat',   'visibility', vis(S.base === 'sat'));
-    map.setLayoutProperty('l-cont',  'visibility', vis(S.contours));
-    if (map.getLayer('route-spd')){
-      map.setLayoutProperty('route-spd',  'visibility', vis(S.speedColor));
-      map.setLayoutProperty('route-line', 'visibility', vis(!S.speedColor));
-      map.setLayoutProperty('route-halo', 'visibility', vis(!S.speedColor));
-    }
-  });
-}
-document.getElementById('bLayers').onclick = () => document.getElementById('layers').classList.toggle('on');
-document.querySelectorAll('#layers .row').forEach(row => row.onclick = () => {
-  if (row.dataset.base){
-    S.base = row.dataset.base;
-    document.querySelectorAll('#layers .row[data-base]').forEach(r => r.classList.toggle('sel', r === row));
-  } else if (row.dataset.ov === 'contours'){
-    S.contours = !S.contours; row.classList.toggle('sel', S.contours);
-  } else {
-    S.speedColor = !S.speedColor; row.classList.toggle('sel', S.speedColor);
-  }
-  applyLayers();
-});
-
-const wSlider = document.getElementById('wSlider');
+// ---------- вес и темп ----------
 wSlider.value = S.load;
-document.getElementById('wVal').textContent = S.load + ' кг';
 wSlider.oninput = () => {
   S.load = +wSlider.value;
   localStorage.setItem('load', S.load);
-  document.getElementById('wVal').textContent = S.load + ' кг';
-  const [c, txt] = loadBand(S.load, S.body);
-  bandTxt.textContent = txt; bandTxt.style.color = c;
-  if (S.segs.length) render();
+  if (S.segs.length) render(); else updateWeightUI();
 };
 document.querySelectorAll('#pace button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#pace button').forEach(x => x.classList.remove('sel'));
-  b.classList.add('sel'); S.power = +b.dataset.p; if (S.segs.length) render();
+  b.classList.add('sel'); S.power = +b.dataset.p;
+  if (S.segs.length) render();
 });
-document.getElementById('grip').onclick = () => sheet.classList.toggle('open');
-pill.onclick = () => sheet.classList.toggle('open');
 
 // ---------- онбординг ----------
 let sample = null, obStep = 0;
@@ -560,19 +690,25 @@ function obRender(){
       document.getElementById('obT').textContent = fmtH(t);
       document.getElementById('obN').textContent =
         +w.value === 0 ? 'налегке' : `рюкзак ${w.value} кг — это +${Math.round((t-t0)*60)} мин`;
+      paintSlider(w, +w.value/30*100, '#2f6f4f');
     };
     w.oninput = upd; upd();
   }
 }
 document.getElementById('obNext').onclick = () => {
   if (obStep === 2){ const v = +document.getElementById('obB').value;
-    if (v >= 35 && v <= 160){ S.body = v; localStorage.setItem('body', v); paintBand(); } }
+    if (v >= 35 && v <= 160){ S.body = v; localStorage.setItem('body', v); paintTicks(); updateWeightUI(); } }
   if (obStep < OB.length-1){ obStep++; obRender(); } else obClose();
 };
 document.getElementById('obSkip').onclick = () => obClose();
 function obClose(){ ob.classList.remove('on'); localStorage.setItem('onboarded','1'); }
 
-paintBand();
+// ---------- запуск ----------
+paintTicks();
+updateWeightUI();
+updateEmptyHint();
+applyLayers();
+
 fetch('sample.json').then(r => r.json()).then(j => {
   sample = j;
   if (!localStorage.getItem('onboarded') || location.hash === '#ob'){ ob.classList.add('on'); obRender(); }

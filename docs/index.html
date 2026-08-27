@@ -2,9 +2,14 @@
 <html lang="ru"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
 <title>Время в пути — прототип</title>
 <link href="vendor/maplibre-gl.css" rel="stylesheet">
-<script src="vendor/maplibre-gl.js"></script>
 <style>
 :root{
   --bg:#fff; --fg:#12161c; --muted:#6b7480; --line:#e3e6ea;
@@ -24,72 +29,105 @@ html,body{margin:0;height:100%;overflow:hidden;
   top:calc(var(--safe-top) + 12px);z-index:6;
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
   border-radius:16px;box-shadow:var(--shadow);padding:9px 18px;
-  text-align:center;min-width:150px;max-width:calc(100vw - 110px);display:none;cursor:pointer}
+  text-align:center;min-width:150px;max-width:calc(100vw - 110px);
+  display:none;cursor:pointer}
 #pill.on{display:block}
 #pill .t{font-size:30px;font-weight:650;letter-spacing:-.02em;line-height:1.05;
   font-variant-numeric:tabular-nums}
-#pill .naive{font-size:11.5px;color:var(--muted);margin-top:2px}
+#pill .naive{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap}
 #pill .naive b{color:var(--danger);font-weight:600}
 #pill .sub{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;
   border-top:1px solid var(--line);padding-top:4px;font-variant-numeric:tabular-nums}
 
+/* ---- подсказка пустого состояния ---- */
+#emptyHint{position:absolute;left:50%;transform:translateX(-50%);
+  top:calc(var(--safe-top) + 14px);z-index:5;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+  border-radius:14px;box-shadow:var(--shadow);padding:10px 16px;
+  font-size:13.5px;color:var(--muted);display:none;white-space:nowrap}
+#emptyHint.on{display:block}
+
+/* ---- всплывающее сообщение ---- */
+#toast{position:absolute;left:50%;bottom:calc(var(--safe-bot) + 150px);z-index:15;
+  transform:translateX(-50%) translateY(8px);
+  background:rgba(18,22,28,.88);color:#fff;font-size:13px;
+  padding:9px 14px;border-radius:11px;opacity:0;transition:.25s;
+  pointer-events:none;max-width:82vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
 /* ---- кнопки ---- */
 .btn{position:absolute;z-index:5;width:44px;height:44px;border-radius:12px;
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);box-shadow:var(--shadow);
-  border:0;display:grid;place-items:center;font-size:19px;cursor:pointer;color:var(--fg)}
+  border:0;display:grid;place-items:center;font-size:19px;cursor:pointer;color:var(--fg);
+  transition:bottom .28s cubic-bezier(.3,.8,.3,1)}
 .btn:active{transform:scale(.94)}
 .btn.on{background:var(--accent);color:#fff}
 #bLayers{right:12px;top:calc(var(--safe-top) + 12px)}
 #bDraw{right:12px;bottom:calc(var(--safe-bot) + 96px);width:56px;height:56px;
   border-radius:16px;font-size:23px}
-#bUndo{right:12px;bottom:calc(var(--safe-bot) + 160px);display:none}
+#bUndo{right:12px;bottom:calc(var(--safe-bot) + 164px);display:none}
 #bUndo.on{display:grid}
-#bClear{right:12px;bottom:calc(var(--safe-bot) + 212px);display:none}
+#bClear{right:12px;bottom:calc(var(--safe-bot) + 216px);display:none}
 #bClear.on{display:grid}
+.btn.tucked{display:none !important}
 
 #layers{position:absolute;right:12px;top:calc(var(--safe-top) + 64px);z-index:7;
-  background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:6px;display:none;width:210px}
+  background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:6px;display:none;width:200px}
 #layers.on{display:block}
 #layers .row{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;
-  display:flex;justify-content:space-between;align-items:center}
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
 #layers .row:hover{background:#f4f6f7}
 #layers .row.sel{background:#eef4f0;color:var(--accent);font-weight:600}
+#layers .row.sel::after{content:'✓';font-weight:700}
+#layers .row.dis{opacity:.45}
 #layers .sep{height:1px;background:var(--line);margin:5px 8px}
 #layers .cap{font-size:11px;color:var(--muted);padding:5px 11px 2px;
   text-transform:uppercase;letter-spacing:.05em}
 
-/* ---- шторка ---- */
+/* ---- шторка: три положения, потолок 56% экрана ---- */
 #sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;background:var(--sheet);
   border-radius:18px 18px 0 0;box-shadow:0 -6px 28px rgba(0,0,0,.14);
-  padding:8px 16px calc(var(--safe-bot) + 14px);
-  transform:translateY(calc(100% - 74px));transition:transform .28s cubic-bezier(.3,.8,.3,1)}
-#sheet.open{transform:translateY(0)}
-#grip{width:38px;height:4px;border-radius:2px;background:#d3d8dd;margin:4px auto 10px;cursor:pointer}
-#sheet .hint{text-align:center;font-size:13px;color:var(--muted);margin:-4px 0 8px}
+  max-height:56vh;max-height:56dvh;display:flex;flex-direction:column;
+  transform:translateY(105%);will-change:transform;
+  transition:transform .28s cubic-bezier(.3,.8,.3,1)}
+#sheet.drag{transition:none}
+#sheetHead{padding:9px 0 3px;touch-action:none;cursor:grab;flex:0 0 auto}
+#grip{width:38px;height:4px;border-radius:2px;background:#d3d8dd;margin:0 auto}
+#sheetScroll{overflow-y:auto;padding:2px 16px calc(var(--safe-bot) + 14px)}
 
-.wrow{display:flex;align-items:baseline;justify-content:space-between;margin:2px 0 6px}
+.wrow{display:flex;align-items:baseline;justify-content:space-between;margin:2px 0 2px}
 .wrow .lbl{font-size:13px;color:var(--muted)}
 .wrow .val{font-size:17px;font-weight:650;font-variant-numeric:tabular-nums}
-input[type=range]{width:100%;accent-color:var(--accent);margin:0}
-#band{height:6px;border-radius:3px;margin:7px 0 4px;
-  background:linear-gradient(90deg,#7fae8e 0 25%,#c9c07a 25% 50%,#d9a05b 50% 62.5%,#c4705c 62.5% 75%,#a33a2a 75% 100%)}
-#bandTxt{font-size:12.5px;color:var(--muted);margin-bottom:10px;min-height:17px}
-#sens{font-size:13px;color:var(--fg);background:#f4f6f7;border-radius:9px;
-  padding:8px 11px;margin-bottom:11px}
-#sens b{color:var(--accent)}
 
-#prof{width:100%;height:104px;display:block;touch-action:none}
-#profTxt{font-size:12px;color:var(--muted);text-align:center;min-height:16px;margin-top:2px}
+/* слайдер красится сам: заполненная часть — цветом текущей зоны нагрузки */
+.sliderWrap{position:relative;margin:0 0 4px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;
+  background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;
+  background:var(--fill,#e3e6ea)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:24px;height:24px;border-radius:50%;background:#fff;
+  border:1px solid var(--line);box-shadow:0 1px 5px rgba(0,0,0,.3);margin-top:-9px}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--fill,#e3e6ea)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
+  background:#fff;border:1px solid var(--line)}
+#ticks i{position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:2px;height:12px;border-radius:1px;background:rgba(0,0,0,.16);pointer-events:none}
 
-#stats{display:flex;flex-wrap:wrap;gap:5px 0;margin:10px 0 4px}
-#stats div{flex:1 0 33%;text-align:center}
-#stats .k{font-size:11px;color:var(--muted)}
-#stats .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+#statusLine{font-size:12.5px;min-height:17px;margin:0 0 10px;color:var(--muted)}
 
-#pace{display:flex;gap:6px;margin:10px 0 2px}
+#pace{display:flex;gap:6px;margin:0 0 8px}
 #pace button{flex:1;padding:9px;border-radius:10px;border:1px solid var(--line);
   background:#fff;font-size:13.5px;cursor:pointer;color:var(--fg)}
 #pace button.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+
+#analysis{border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+#prof{width:100%;height:104px;display:block;touch-action:none}
+#profTxt{font-size:12px;color:var(--muted);text-align:center;min-height:16px;margin-top:2px}
+#stats{display:flex;gap:5px 0;margin:10px 0 2px}
+#stats div{flex:1;text-align:center}
+#stats .k{font-size:11px;color:var(--muted)}
+#stats .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
 
 /* ---- онбординг ---- */
 #ob{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;
@@ -125,52 +163,58 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:0}
 
 <div id="pill">
   <div class="t" id="pTime">—</div>
-  <div class="naive">обычный расчёт: <b id="pNaive">—</b></div>
+  <div class="naive">без учёта рельефа: <b id="pNaive">—</b></div>
   <div class="sub" id="pSub"></div>
 </div>
+<div id="emptyHint">Нажмите ✎ и обведите маршрут пальцем</div>
 
 <button class="btn" id="bLayers" title="Слои">◈</button>
 <button class="btn" id="bDraw" title="Рисовать маршрут">✎</button>
-<button class="btn" id="bUndo" title="Отменить мазок">↶</button>
+<button class="btn" id="bUndo" title="Отменить">↶</button>
 <button class="btn" id="bClear" title="Стереть маршрут">✕</button>
 
 <div id="layers">
   <div class="cap">Подложка</div>
-  <div class="row sel" data-base="topo">Топо <span>оффлайн</span></div>
-  <div class="row" data-base="plain">Обычная <span>оффлайн</span></div>
-  <div class="row" data-base="sat">Спутник <span>онлайн</span></div>
+  <div class="row sel" data-base="topo">Топо</div>
+  <div class="row" data-base="plain">Обычная</div>
+  <div class="row" data-base="sat">Спутник</div>
   <div class="sep"></div>
   <div class="cap">Поверх</div>
   <div class="row" data-ov="contours">Горизонтали</div>
-  <div class="row" data-ov="speed">Скорость по треку</div>
+  <div class="sep"></div>
+  <div class="cap">Маршрут</div>
+  <div class="row" data-ov="speed">Цвет по скорости</div>
 </div>
 
 <div id="sheet">
-  <div id="grip"></div>
-  <div class="hint" id="hint">Нажмите карандаш и обведите маршрут пальцем</div>
-
-  <div class="wrow"><span class="lbl">Рюкзак</span><span class="val" id="wVal">10 кг</span></div>
-  <input type="range" id="wSlider" min="0" max="40" step="1" value="10">
-  <div id="band"></div>
-  <div id="bandTxt"></div>
-
-  <div id="sens">Каждый лишний килограмм: <b id="sensVal">—</b></div>
-
-  <svg id="prof" viewBox="0 0 340 104" preserveAspectRatio="none"></svg>
-  <div id="profTxt">Коснитесь графика — точка подсветится на карте</div>
-
-  <div id="stats">
-    <div><div class="k">расстояние</div><div class="v" id="sDist">—</div></div>
-    <div><div class="k">набор</div><div class="v" id="sGain">—</div></div>
-    <div><div class="k">сброс</div><div class="v" id="sLoss">—</div></div>
-  </div>
-
-  <div id="pace">
-    <button data-p="3.0">Медленно</button>
-    <button data-p="3.6" class="sel">Обычно</button>
-    <button data-p="4.3">Быстро</button>
+  <div id="sheetHead"><div id="grip"></div></div>
+  <div id="sheetScroll">
+    <div id="inputs">
+      <div class="wrow"><span class="lbl">Рюкзак</span><span class="val" id="wVal">10 кг</span></div>
+      <div class="sliderWrap">
+        <input type="range" id="wSlider" min="0" max="40" step="1" value="10">
+        <div id="ticks"></div>
+      </div>
+      <div id="statusLine"></div>
+      <div id="pace">
+        <button data-p="3.0">Медленно</button>
+        <button data-p="3.6" class="sel">Обычно</button>
+        <button data-p="4.3">Быстро</button>
+      </div>
+    </div>
+    <div id="analysis">
+      <svg id="prof" viewBox="0 0 340 104" preserveAspectRatio="none"></svg>
+      <div id="profTxt">Коснитесь графика — точка подсветится на карте</div>
+      <div id="stats">
+        <div><div class="k">набор</div><div class="v" id="sGain">—</div></div>
+        <div><div class="k">сброс</div><div class="v" id="sLoss">—</div></div>
+        <div><div class="k">средний темп</div><div class="v" id="sPaceAvg">—</div></div>
+      </div>
+    </div>
   </div>
 </div>
+
+<div id="toast"></div>
 
 <div id="ob"><div class="body" id="obBody"></div>
   <div id="dots"><i class="on"></i><i></i><i></i></div>
@@ -178,5 +222,6 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:0}
     <button id="obNext">Дальше</button></div>
 </div>
 
+<script src="vendor/maplibre-gl.js"></script>
 <script src="app.js"></script>
 </body></html>
