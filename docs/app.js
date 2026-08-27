@@ -21,6 +21,14 @@ function timeHours(segs, body, load, powerPerKg, terrain = 1){
   return t/3600;
 }
 const naiveHours = m => m/1000/4;
+/* Привалы: походный ритм ~50/10 — десять минут отдыха на каждый час хода,
+   плюс обед 30 минут, если ходового времени больше четырёх часов. */
+function withBreaks(movH){
+  const movMin = movH*60;
+  const n10 = Math.max(0, Math.ceil(movMin/55) - 1);
+  const lunch = movMin > 240 ? 30 : 0;
+  return {total: movH + (n10*10 + lunch)/60, n10, lunch};
+}
 const fmtH = h => { let m = Math.round(h*60); return `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`; };
 
 // ---------- геометрия ----------
@@ -453,9 +461,10 @@ function render(){
   const {segs, body, load, power} = S;
   const t = timeHours(segs, body, load, power, S.terrain);
   const n = naiveHours(S.dist);
+  const br = withBreaks(t);
 
   pill.classList.add('on');
-  pTime.textContent = fmtH(t);
+  pTime.textContent = fmtH(br.total);
   pNaive.textContent = fmtH(n);
   pSub.textContent = `${(S.dist/1000).toFixed(1)} км · ↑${Math.round(S.gain)} м · ↓${Math.round(S.loss)} м`;
   bUndo.classList.add('on'); bClear.classList.add('on');
@@ -463,6 +472,10 @@ function render(){
   sGain.textContent = Math.round(S.gain) + ' м';
   sLoss.textContent = Math.round(S.loss) + ' м';
   sPaceAvg.textContent = t > 0 ? (S.dist/1000/t).toFixed(1) + ' км/ч' : '—';
+  document.getElementById('restLine').textContent =
+    `в движении ${fmtH(t)}` +
+    (br.n10 ? ` · привалы ${br.n10} × 10 мин` : ' · без привалов') +
+    (br.lunch ? ` · обед ${br.lunch} мин` : '');
 
   const t1 = timeHours(segs, body, load+1, power, S.terrain);
   S.sens = Math.round((t1-t)*60);
