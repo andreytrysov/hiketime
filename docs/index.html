@@ -59,14 +59,17 @@ html,body{margin:0;height:100%;overflow:hidden;
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);box-shadow:var(--shadow);
   border:0;display:grid;place-items:center;font-size:19px;cursor:pointer;color:var(--fg);
   transition:bottom .28s cubic-bezier(.3,.8,.3,1)}
+.btn svg{width:21px;height:21px;fill:none;stroke:currentColor;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#bDraw svg{width:24px;height:24px}
 .btn:active{transform:scale(.94)}
 .btn.on{background:var(--accent);color:#fff}
 #bLayers{right:12px;top:calc(var(--safe-top) + 12px)}
-#bDraw{right:12px;bottom:calc(var(--safe-bot) + 96px);width:56px;height:56px;
+#bDraw{right:12px;bottom:calc(var(--safe-bot) + 44px);width:56px;height:56px;
   border-radius:16px;font-size:23px}
-#bUndo{right:12px;bottom:calc(var(--safe-bot) + 164px);display:none}
+#bUndo{right:12px;bottom:calc(var(--safe-bot) + 112px);display:none}
 #bUndo.on{display:grid}
-#bClear{right:12px;bottom:calc(var(--safe-bot) + 216px);display:none}
+#bClear{right:12px;bottom:calc(var(--safe-bot) + 164px);display:none}
 #bClear.on{display:grid}
 .btn.tucked{display:none !important}
 
@@ -190,9 +193,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 </div>
 <div id="emptyHint">Нажмите ✎ и нарисуйте маршрут пальцем</div>
 
-<button class="btn" id="bLayers" title="Слои">◈</button>
-<button class="btn" id="bRoutes" title="Мои маршруты" style="left:12px;top:calc(var(--safe-top) + 12px);right:auto">☰</button>
-<button class="btn" id="bSettings" title="Настройки" style="left:12px;top:calc(var(--safe-top) + 64px);right:auto">⚙</button>
+<button class="btn" id="bLayers" title="Слои"><svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/></svg></button>
+<button class="btn" id="bRoutes" title="Мои маршруты" style="left:12px;top:calc(var(--safe-top) + 12px);right:auto"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<button class="btn" id="bSettings" title="Настройки" style="left:12px;top:calc(var(--safe-top) + 64px);right:auto"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg></button>
 <div id="routes"></div>
 <div id="settings">
   <div class="cap">Настройки</div>
@@ -201,9 +204,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
   <div class="sep"></div>
   <div class="row" id="setOb">Показать обучение</div>
 </div>
-<button class="btn" id="bDraw" title="Рисовать маршрут">✎</button>
-<button class="btn" id="bUndo" title="Отменить">↶</button>
-<button class="btn" id="bClear" title="Стереть маршрут">✕</button>
+<button class="btn" id="bDraw" title="Рисовать маршрут"><svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+<button class="btn" id="bUndo" title="Отменить"><svg viewBox="0 0 24 24"><path d="M3 5v6h6"/><path d="M3.5 11a8.5 8.5 0 1 1 2.1 5.6"/></svg></button>
+<button class="btn" id="bClear" title="Стереть маршрут"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 
 <div id="layers">
   <div class="cap">Подложка</div>
@@ -266,5 +269,5 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 </div>
 
 <script src="vendor/maplibre-gl.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=9"></script>
 </body></html>

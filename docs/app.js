@@ -579,7 +579,7 @@ function sheetTo(pos){
   // кнопки рисования уезжают выше шторки, а в полной позиции прячутся
   const visible = pos === 'hidden' ? 0 : p.h - p[pos];
   [bDraw, bUndo, bClear].forEach(b => b.classList.toggle('tucked', pos === 'full'));
-  const base = visible ? visible + 14 : 96;
+  const base = visible ? visible + 14 : 44;
   bDraw.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base}px)`;
   bUndo.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base + 68}px)`;
   bClear.style.bottom = `calc(env(safe-area-inset-bottom,0px) + ${base + 120}px)`;
