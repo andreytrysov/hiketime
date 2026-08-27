@@ -1,0 +1,4 @@
+module HikeTimeCore {
+    header "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/HikeTimeCore-Swift.h"
+    requires objc
+}

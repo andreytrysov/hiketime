@@ -1,0 +1,6 @@
+version: "Apple Swift version 5.10 (swiftlang-5.10.0.13 clang-1500.3.9.4)"
+options: "8b3659c3a6f40ca00abd7aba7ee68466"
+build_time: [1787854782, 830624000]
+inputs:
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift": [1787854729, 577469131]
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift": [1787854692, 626738843]

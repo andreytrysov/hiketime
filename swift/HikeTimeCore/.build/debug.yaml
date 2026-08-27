@@ -1,0 +1,155 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "HikeTimeCore-debug.module": ["<HikeTimeCore-debug.module>"]
+  "HikeTimeCorePackageTests-debug.test": ["<HikeTimeCorePackageTests-debug.test>"]
+  "HikeTimeCoreTests-debug.module": ["<HikeTimeCoreTests-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "hiketime-verify-debug.exe": ["<hiketime-verify-debug.exe>"]
+  "hiketime-verify-debug.module": ["<hiketime-verify-debug.module>"]
+  "main": ["<HikeTimeCore-debug.module>","<hiketime-verify-debug.exe>","<hiketime-verify-debug.module>"]
+  "test": ["<HikeTimeCore-debug.module>","<HikeTimeCorePackageTests-debug.test>","<HikeTimeCoreTests-debug.module>","<hiketime-verify-debug.exe>","<hiketime-verify-debug.module>"]
+default: "main"
+nodes:
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/hiketime-verify/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Tests/HikeTimeCoreTests/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify":
+    is-mutated: true
+commands:
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/sources"]
+    description: "Write auxiliary file /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/sources"
+
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/ReferenceTests.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/resource_bundle_accessor.swift.o"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.product/Objects.LinkFileList"
+
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Tests/HikeTimeCoreTests/ReferenceTests.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/DerivedSources/resource_bundle_accessor.swift"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/sources"]
+    description: "Write auxiliary file /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/sources"
+
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore_HikeTimeCoreTests.bundle/Fixtures":
+    tool: copy-tool
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Tests/HikeTimeCoreTests/Fixtures/"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore_HikeTimeCoreTests.bundle/Fixtures/"]
+    description: "Copying /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Tests/HikeTimeCoreTests/Fixtures"
+
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify-entitlement.plist":
+    tool: write-auxiliary-file
+    inputs: ["<entitlement-plist>","<com.apple.security.get-task-allow>"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify-entitlement.plist"]
+    description: "Write auxiliary file /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify-entitlement.plist"
+
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main.swift.o"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify.product/Objects.LinkFileList"
+
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/hiketime-verify/main.swift"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/sources"]
+    description: "Write auxiliary file /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/sources"
+
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Library/Developer/CommandLineTools/usr/bin/swiftc"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+
+  "<HikeTimeCore-debug.module>":
+    tool: phony
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule"]
+    outputs: ["<HikeTimeCore-debug.module>"]
+
+  "<HikeTimeCorePackageTests-debug.test>":
+    tool: phony
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.xctest/Contents/MacOS/HikeTimeCorePackageTests"]
+    outputs: ["<HikeTimeCorePackageTests-debug.test>"]
+
+  "<HikeTimeCoreTests-debug.module>":
+    tool: phony
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/ReferenceTests.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/resource_bundle_accessor.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.swiftmodule"]
+    outputs: ["<HikeTimeCoreTests-debug.module>"]
+
+  "<hiketime-verify-debug.exe>":
+    tool: phony
+    inputs: ["<hiketime-verify-debug.exe-CodeSigning>"]
+    outputs: ["<hiketime-verify-debug.exe>"]
+
+  "<hiketime-verify-debug.module>":
+    tool: phony
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.swiftmodule"]
+    outputs: ["<hiketime-verify-debug.module>"]
+
+  "C.HikeTimeCore-debug.module":
+    tool: shell
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/sources"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule"]
+    description: "Compiling Swift Module 'HikeTimeCore' (2 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","HikeTimeCore","-emit-dependencies","-emit-module","-emit-module-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule","-output-file-map","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/output-file-map.json","-parse-as-library","-incremental","-c","@/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/sources","-I","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug","-target","arm64-apple-macosx10.13","-swift-version","5","-enable-batch-mode","-index-store-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j11","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-emit-objc-header","-emit-objc-header-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/HikeTimeCore-Swift.h","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","hiketimecore"]
+
+  "C.HikeTimeCorePackageTests-debug.test":
+    tool: shell
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/ReferenceTests.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/resource_bundle_accessor.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.product/Objects.LinkFileList"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.xctest/Contents/MacOS/HikeTimeCorePackageTests"]
+    description: "Linking ./.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.xctest/Contents/MacOS/HikeTimeCorePackageTests"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-L","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug","-o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.xctest/Contents/MacOS/HikeTimeCorePackageTests","-module-name","HikeTimeCorePackageTests","-Xlinker","-bundle","-Xlinker","-rpath","-Xlinker","@loader_path/../../../","@/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCorePackageTests.product/Objects.LinkFileList","-Xlinker","-rpath","-Xlinker","/Library/Developer/CommandLineTools/usr/lib/swift-5.5/macosx","-target","arm64-apple-macosx10.13","-Xlinker","-add_ast_path","-Xlinker","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule","-Xlinker","-add_ast_path","-Xlinker","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.swiftmodule","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g"]
+
+  "C.HikeTimeCoreTests-debug.module":
+    tool: shell
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Tests/HikeTimeCoreTests/ReferenceTests.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/DerivedSources/resource_bundle_accessor.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","<HikeTimeCoreTests-debug.module-resources>","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/sources"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/ReferenceTests.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/resource_bundle_accessor.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.swiftmodule"]
+    description: "Compiling Swift Module 'HikeTimeCoreTests' (2 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","HikeTimeCoreTests","-emit-dependencies","-emit-module","-emit-module-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.swiftmodule","-output-file-map","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/output-file-map.json","-parse-as-library","-incremental","-c","@/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCoreTests.build/sources","-I","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug","-target","arm64-apple-macosx10.13","-swift-version","5","-enable-batch-mode","-index-store-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j11","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","hiketimecore"]
+
+  "C.hiketime-verify-debug.exe":
+    tool: shell
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify.product/Objects.LinkFileList"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify"]
+    description: "Linking ./.build/arm64-apple-macosx/debug/hiketime-verify"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-L","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug","-o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify","-module-name","hiketime_verify","-emit-executable","-Xlinker","-alias","-Xlinker","_hiketime_verify_main","-Xlinker","_main","-Xlinker","-rpath","-Xlinker","@loader_path","@/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify.product/Objects.LinkFileList","-Xlinker","-rpath","-Xlinker","/Library/Developer/CommandLineTools/usr/lib/swift-5.5/macosx","-target","arm64-apple-macosx10.13","-Xlinker","-add_ast_path","-Xlinker","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule","-Xlinker","-add_ast_path","-Xlinker","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.swiftmodule","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g"]
+
+  "C.hiketime-verify-debug.exe-entitlements":
+    tool: shell
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify-entitlement.plist"]
+    outputs: ["<hiketime-verify-debug.exe-CodeSigning>"]
+    description: "Applying debug entitlements to ./.build/arm64-apple-macosx/debug/hiketime-verify"
+    args: ["codesign","--force","--sign","-","--entitlements","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify-entitlement.plist","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime-verify"]
+
+  "C.hiketime-verify-debug.module":
+    tool: shell
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/hiketime-verify/main.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/sources"]
+    outputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main.swift.o","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.swiftmodule"]
+    description: "Compiling Swift Module 'hiketime_verify' (1 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","hiketime_verify","-emit-dependencies","-emit-module","-emit-module-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.swiftmodule","-output-file-map","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/output-file-map.json","-incremental","-c","@/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/sources","-I","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug","-target","arm64-apple-macosx10.13","-swift-version","5","-enable-batch-mode","-index-store-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j11","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","hiketime_verify_main","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","hiketimecore"]
+
+  "HikeTimeCoreTests-debug.module-resources":
+    tool: phony
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore_HikeTimeCoreTests.bundle/Fixtures/"]
+    outputs: ["<HikeTimeCoreTests-debug.module-resources>"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/hiketime-verify/","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Tests/HikeTimeCoreTests/","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Package.swift","/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

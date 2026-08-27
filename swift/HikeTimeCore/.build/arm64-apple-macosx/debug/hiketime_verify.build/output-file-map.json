@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/master.swiftdeps"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/hiketime-verify/main.swift": {
+    "dependencies": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main.d",
+    "object": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main.swift.o",
+    "swiftmodule": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/hiketime_verify.build/main.swiftdeps"
+  }
+}
