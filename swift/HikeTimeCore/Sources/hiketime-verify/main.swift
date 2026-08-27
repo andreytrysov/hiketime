@@ -97,5 +97,46 @@ for c in demFix.cases {
 }
 check(demOK, "5 высот совпадают с Python в пределах 5 см")
 
+print("конвейер маршрута (5 точек -> профиль -> сводка):")
+struct PipeFix: Codable {
+    struct P: Codable { let lat, lon: Double }
+    let waypoints: [P]
+    let tiles: [[Int]]
+    let dist_m, gain_m, loss_m: Double
+    let n_points: Int
+    let ele_first, ele_last: Double
+}
+let pipeURL = root.appendingPathComponent("Tests/HikeTimeCoreTests/Fixtures/pipeline_reference.json")
+let pipe = try! JSONDecoder().decode(PipeFix.self, from: Data(contentsOf: pipeURL))
+var tileCache: [DEM.TileKey: DEM.Tile] = [:]
+let provider: DEM.TileProvider = { key in
+    if let t = tileCache[key] { return t }
+    let u = root.appendingPathComponent(
+        "Tests/HikeTimeCoreTests/Fixtures/tile_\(key.z)_\(key.x)_\(key.y).png")
+    guard let t = DEM.Tile(pngData: try Data(contentsOf: u)) else {
+        throw DEM.DEMError.tileUnavailable(key)
+    }
+    tileCache[key] = t
+    return t
+}
+let profile = try! RouteBuilder.build(
+    points: pipe.waypoints.map { GeoPoint(lat: $0.lat, lon: $0.lon) },
+    provider: provider)
+check(profile.points.count == pipe.n_points, "точек после ресемплинга: \(profile.points.count)")
+check(near(profile.distM, pipe.dist_m, rel: 1e-4), "дистанция \(String(format: "%.1f", profile.distM)) м")
+check(near(profile.gainM, pipe.gain_m, rel: 1e-3), "набор \(String(format: "%.1f", profile.gainM)) м")
+check(near(profile.lossM, pipe.loss_m, rel: 1e-2), "сброс \(String(format: "%.1f", profile.lossM)) м")
+check(near(profile.elevations.first!, pipe.ele_first, rel: 1e-4)
+   && near(profile.elevations.last!, pipe.ele_last, rel: 1e-4), "края профиля")
+
+print("GPX:")
+let gpxURL = root.appendingPathComponent("Tests/HikeTimeCoreTests/Fixtures/sample.gpx")
+let track = GPX.parse(try! Data(contentsOf: gpxURL))!
+check(track.points.count == 5, "5 точек")
+check(track.elevations?.count == 5, "высоты прочитаны")
+check(near(track.elapsedHours ?? 0, 2.5, rel: 1e-9), "полное время 2:30")
+// вторая точка стоит на месте 20 минут — движение должно её выбросить
+check((track.movingHours() ?? 0) < 2.2, "привал вычтен из времени движения")
+
 print(failed == 0 ? "\nВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "\nПРОВАЛЕНО: \(failed)")
 exit(failed == 0 ? 0 : 1)
