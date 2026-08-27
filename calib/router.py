@@ -9,7 +9,11 @@ import hashlib, heapq, json, math, os, ssl, time, urllib.parse, urllib.request
 import certifi
 
 CACHE = os.path.join(os.path.dirname(__file__), "overpass_cache")
-API = "https://overpass-api.de/api/interpreter"
+APIS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+]
 FOOT = "path|footway|track|steps|bridleway|unclassified|residential|service|pedestrian|living_street"
 
 
@@ -21,18 +25,20 @@ def _fetch(query):
         return json.load(open(key))
     ctx = ssl.create_default_context(cafile=certifi.where())
     data = urllib.parse.urlencode({"data": query}).encode()
-    req = urllib.request.Request(API, data=data, headers={
-        "User-Agent": "hiketime-calibration/0.1 (andreytrysov@gmail.com)"})
-    for attempt in range(5):
+    last = None
+    for attempt in range(6):
+        api = APIS[attempt % len(APIS)]
+        req = urllib.request.Request(api, data=data, headers={
+            "User-Agent": "hiketime-calibration/0.1 (andreytrysov@gmail.com)"})
         try:
             with urllib.request.urlopen(req, timeout=180, context=ctx) as r:
                 out = json.load(r)
             json.dump(out, open(key, "w"))
             return out
-        except Exception:
-            if attempt == 4:
-                raise
-            time.sleep(25)
+        except Exception as e:
+            last = e
+            time.sleep(20)
+    raise last
 
 
 def haversine(a, b):
