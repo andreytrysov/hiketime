@@ -182,7 +182,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 /* штатные контролы MapLibre — под стиль наших кнопок */
 .maplibregl-ctrl-group{border-radius:12px;box-shadow:var(--shadow);
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px)}
-.maplibregl-ctrl-group button{width:44px;height:44px}
+.maplibregl-ctrl-group{border:0}
+.maplibregl-ctrl-group button{width:44px;height:44px;border:0 !important;
+  outline:none;border-radius:12px}
+.maplibregl-ctrl-group button:focus{box-shadow:none}
 .maplibregl-ctrl button .maplibregl-ctrl-icon{background-size:22px 22px}
 .maplibregl-ctrl-bottom-left{margin-bottom:calc(var(--safe-bot) + 30px)}
 /* на тачах зум — щипком и двойным тапом, кнопки только занимают место */
@@ -277,5 +280,5 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 </div>
 
 <script src="vendor/maplibre-gl.js"></script>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=15"></script>
 </body></html>
