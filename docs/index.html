@@ -69,17 +69,21 @@ html,body{margin:0;height:100%;overflow:hidden;
 #bClear.on{display:grid}
 .btn.tucked{display:none !important}
 
-#layers{position:absolute;right:12px;top:calc(var(--safe-top) + 64px);z-index:7;
+#layers,#routes{position:absolute;right:12px;top:calc(var(--safe-top) + 64px);z-index:7;
   background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:6px;display:none;width:200px}
-#layers.on{display:block}
-#layers .row{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;
+#layers.on,#routes.on{display:block}
+#routes{left:12px;right:auto;width:254px;max-height:52vh;overflow-y:auto}
+#layers .row,#routes .row{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;
   display:flex;justify-content:space-between;align-items:center;gap:8px}
-#layers .row:hover{background:#f4f6f7}
+#layers .row:hover,#routes .row:hover{background:#f4f6f7}
 #layers .row.sel{background:#eef4f0;color:var(--accent);font-weight:600}
 #layers .row.sel::after{content:'✓';font-weight:700}
 #layers .row.dis{opacity:.45}
-#layers .sep{height:1px;background:var(--line);margin:5px 8px}
-#layers .cap{font-size:11px;color:var(--muted);padding:5px 11px 2px;
+#layers .sep,#routes .sep{height:1px;background:var(--line);margin:5px 8px}
+#routes .saveRow{color:var(--accent);font-weight:600}
+#routes .meta{font-size:11px;color:var(--muted)}
+#routes .rx{color:var(--muted);padding:2px 7px;font-size:15px;flex:0 0 auto}
+#layers .cap,#routes .cap{font-size:11px;color:var(--muted);padding:5px 11px 2px;
   text-transform:uppercase;letter-spacing:.05em}
 
 /* ---- шторка: три положения, потолок 56% экрана ---- */
@@ -114,10 +118,15 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 
 #statusLine{font-size:12.5px;min-height:17px;margin:0 0 10px;color:var(--muted)}
 
-.segrow{display:flex;gap:6px;margin:0 0 8px}
-.segrow button{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--line);
-  background:#fff;font-size:13px;cursor:pointer;color:var(--fg)}
-.segrow button.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+#restSummary{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 8px;
+  min-height:17px;font-variant-numeric:tabular-nums}
+.selrow{display:flex;gap:8px;margin:0 0 8px}
+.selrow label{flex:1;font-size:11.5px;color:var(--muted);display:flex;
+  flex-direction:column;gap:4px}
+.selrow select{width:100%;padding:9px 26px 9px 10px;border-radius:10px;
+  border:1px solid var(--line);font-size:14px;color:var(--fg);
+  -webkit-appearance:none;appearance:none;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7480' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 9px center}
 
 #analysis{border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
 #prof{width:100%;height:104px;display:block;touch-action:none}
@@ -168,6 +177,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 <div id="emptyHint">Нажмите ✎ и нарисуйте маршрут пальцем</div>
 
 <button class="btn" id="bLayers" title="Слои">◈</button>
+<button class="btn" id="bRoutes" title="Мои маршруты" style="left:12px;top:calc(var(--safe-top) + 12px);right:auto">☰</button>
+<div id="routes"></div>
 <button class="btn" id="bDraw" title="Рисовать маршрут">✎</button>
 <button class="btn" id="bUndo" title="Отменить">↶</button>
 <button class="btn" id="bClear" title="Стереть маршрут">✕</button>
@@ -189,23 +200,26 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
   <div id="sheetHead"><div id="grip"></div></div>
   <div id="sheetScroll">
     <div id="inputs">
+      <div id="restSummary"></div>
       <div class="wrow"><span class="lbl">Рюкзак</span><span class="val" id="wVal">10 кг</span></div>
       <div class="sliderWrap">
         <input type="range" id="wSlider" min="0" max="40" step="1" value="10">
         <div id="ticks"></div>
       </div>
       <div id="statusLine"></div>
-      <div class="wrow"><span class="lbl">Покрытие</span></div>
-      <div class="segrow" id="surf">
-        <button data-t="1">Тропа</button>
-        <button data-t="1.55">Тундра, кусты</button>
-        <button data-t="1.9">Болото, камни</button>
-      </div>
-      <div class="wrow"><span class="lbl">Темп</span></div>
-      <div class="segrow" id="pace">
-        <button data-p="3.0">Медленно</button>
-        <button data-p="3.6" class="sel">Обычно</button>
-        <button data-p="4.3">Быстро</button>
+      <div class="selrow">
+        <label>Покрытие
+          <select id="surfSel">
+            <option value="1">Тропа</option>
+            <option value="1.55">Тундра, кусты</option>
+            <option value="1.9">Болото, камни</option>
+          </select></label>
+        <label>Темп
+          <select id="paceSel">
+            <option value="3.0">Медленно</option>
+            <option value="3.6" selected>Обычно</option>
+            <option value="4.3">Быстро</option>
+          </select></label>
       </div>
     </div>
     <div id="analysis">

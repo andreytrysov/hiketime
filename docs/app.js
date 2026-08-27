@@ -385,6 +385,7 @@ function clearRoute(){
   pill.classList.remove('on');
   bUndo.classList.remove('on'); bClear.classList.remove('on');
   ['sGain','sLoss','sPaceAvg'].forEach(id => document.getElementById(id).textContent = '—');
+  ['restSummary','restLine'].forEach(id => document.getElementById(id).textContent = '');
   document.getElementById('prof').innerHTML = '';
   sheetTo('hidden');
   updateEmptyHint();
@@ -471,11 +472,12 @@ function render(){
   sGain.textContent = Math.round(S.gain) + ' м';
   sLoss.textContent = Math.round(S.loss) + ' м';
   sPaceAvg.textContent = t > 0 ? (S.dist/1000/t).toFixed(1) + ' км/ч' : '—';
-  document.getElementById('restLine').textContent =
+  document.getElementById('restSummary').textContent =
     `в движении ${fmtH(t)}` +
     (br.n10 ? ` · привалы ${br.n10} × 10 мин` : ' · без привалов') +
-    (br.lunch ? ` · обед ${br.lunch} мин` : '') +
-    ` · без рельефа вышло бы ${fmtH(n)}`;
+    (br.lunch ? ` · обед ${br.lunch} мин` : '');
+  document.getElementById('restLine').textContent =
+    `без учёта рельефа и веса вышло бы ${fmtH(n)}`;
 
   const t1 = timeHours(segs, body, load+1, power, S.terrain);
   S.sens = Math.round((t1-t)*60);
@@ -572,7 +574,7 @@ function sheetTo(pos){
   SHEET.pos = pos;
   const p = sheetPositions();
   sheet.style.transform = `translateY(${p[pos]}px)`;
-  if (pos !== 'hidden') closeLayers();
+  if (pos !== 'hidden'){ closeLayers(); closeRoutes(); }
   // кнопки рисования уезжают выше шторки, а в полной позиции прячутся
   const visible = pos === 'hidden' ? 0 : p.h - p[pos];
   [bDraw, bUndo, bClear].forEach(b => b.classList.toggle('tucked', pos === 'full'));
@@ -618,12 +620,13 @@ pill.onclick = () => sheetTo(SHEET.pos === 'hidden' ? 'half' : 'hidden');
 // ---------- слои ----------
 function closeLayers(){
   layersEl.classList.remove('on');
-  pill.style.visibility = '';
+  updatePillVis();
 }
 document.getElementById('bLayers').onclick = () => {
   if (layersEl.classList.contains('on')) return closeLayers();
+  closeRoutes();
   layersEl.classList.add('on');
-  pill.style.visibility = 'hidden';   // иначе меню ложится поверх плашки
+  updatePillVis();   // панель и плашка не должны перекрываться
 };
 document.querySelectorAll('#layers .row').forEach(row => row.onclick = () => {
   if (row.dataset.base){
@@ -666,21 +669,94 @@ wSlider.oninput = () => {
   localStorage.setItem('load', S.load);
   if (S.segs.length) render(); else updateWeightUI();
 };
-document.querySelectorAll('#surf button').forEach(b => {
-  if (+b.dataset.t === S.terrain) b.classList.add('sel');
-  b.onclick = () => {
-    document.querySelectorAll('#surf button').forEach(x => x.classList.remove('sel'));
-    b.classList.add('sel');
-    S.terrain = +b.dataset.t;
-    localStorage.setItem('terrain', S.terrain);
-    if (S.segs.length) render();
-  };
-});
-document.querySelectorAll('#pace button').forEach(b => b.onclick = () => {
-  document.querySelectorAll('#pace button').forEach(x => x.classList.remove('sel'));
-  b.classList.add('sel'); S.power = +b.dataset.p;
+const surfSel = document.getElementById('surfSel');
+const paceSel = document.getElementById('paceSel');
+surfSel.value = String(S.terrain);
+surfSel.onchange = () => {
+  S.terrain = +surfSel.value;
+  localStorage.setItem('terrain', S.terrain);
   if (S.segs.length) render();
-});
+};
+paceSel.onchange = () => {
+  S.power = +paceSel.value;
+  if (S.segs.length) render();
+};
+
+// ---------- сохранённые маршруты (локально, на этом устройстве) ----------
+const routesEl = document.getElementById('routes');
+
+function loadRoutes(){
+  try { return JSON.parse(localStorage.getItem('routes') || '[]'); }
+  catch(e){ return []; }
+}
+function persistRoutes(r){ localStorage.setItem('routes', JSON.stringify(r)); }
+
+function saveCurrent(){
+  if (S.path.length < 2) return;
+  const r = loadRoutes();
+  r.unshift({
+    id: Date.now(),
+    name: `Маршрут ${(S.dist/1000).toFixed(1)} км`,
+    ts: Date.now(),
+    path: S.path, load: S.load, terrain: S.terrain, power: S.power,
+    dist: S.dist, time: pTime.textContent
+  });
+  if (r.length > 30) r.pop();          // прототип, не база данных
+  persistRoutes(r);
+  renderRoutes();
+  toast('Маршрут сохранён на этом устройстве');
+}
+
+function openRoute(o){
+  S.path = o.path.slice(); S.history = [];
+  S.load = o.load; wSlider.value = o.load; localStorage.setItem('load', o.load);
+  S.terrain = o.terrain || 1; surfSel.value = String(S.terrain);
+  S.power = o.power || 3.6; paceSel.value = String(S.power);
+  drawPreview(); recompute();
+  const lons = o.path.map(p => p[0]), lats = o.path.map(p => p[1]);
+  map.fitBounds([[Math.min(...lons), Math.min(...lats)],
+                 [Math.max(...lons), Math.max(...lats)]], {padding: 70});
+  closeRoutes();
+}
+
+function renderRoutes(){
+  const list = loadRoutes();
+  let html = S.path.length > 1
+    ? '<div class="row saveRow" id="rSave">Сохранить текущий маршрут</div><div class="sep"></div>'
+    : '';
+  html += '<div class="cap">Мои маршруты</div>';
+  html += list.length ? list.map(o =>
+      `<div class="row" data-id="${o.id}"><span><span>${o.name}</span><br>` +
+      `<span class="meta">${(o.dist/1000).toFixed(1)} км · ${o.time} · ` +
+      `${new Date(o.ts).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</span></span>` +
+      `<span class="rx" data-del="${o.id}">✕</span></div>`).join('')
+    : '<div class="row" style="color:var(--muted)">Пока пусто — нарисуйте и сохраните</div>';
+  routesEl.innerHTML = html;
+  const sv = document.getElementById('rSave');
+  if (sv) sv.onclick = saveCurrent;
+  routesEl.querySelectorAll('.rx').forEach(x => x.onclick = e => {
+    e.stopPropagation();
+    persistRoutes(loadRoutes().filter(o => o.id !== +x.dataset.del));
+    renderRoutes();
+  });
+  routesEl.querySelectorAll('.row[data-id]').forEach(r => r.onclick = () => {
+    const o = loadRoutes().find(q => q.id === +r.dataset.id);
+    if (o) openRoute(o);
+  });
+}
+
+function closeRoutes(){ routesEl.classList.remove('on'); updatePillVis(); }
+function updatePillVis(){
+  pill.style.visibility =
+    (layersEl.classList.contains('on') || routesEl.classList.contains('on')) ? 'hidden' : '';
+}
+document.getElementById('bRoutes').onclick = () => {
+  if (routesEl.classList.contains('on')) return closeRoutes();
+  closeLayers();
+  renderRoutes();
+  routesEl.classList.add('on');
+  updatePillVis();
+};
 
 // ---------- онбординг ----------
 let sample = null, obStep = 0;
