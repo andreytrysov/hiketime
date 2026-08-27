@@ -71,6 +71,8 @@ html,body{margin:0;height:100%;overflow:hidden;
 #bUndo.on{display:grid}
 #bClear{right:12px;bottom:calc(var(--safe-bot) + 164px);display:none}
 #bClear.on{display:grid}
+#bSave{right:12px;bottom:calc(var(--safe-bot) + 216px);display:none}
+#bSave.on{display:grid}
 .btn.tucked{display:none !important}
 
 #layers,#routes,#settings{position:absolute;right:12px;top:calc(var(--safe-top) + 64px);z-index:7;
@@ -127,10 +129,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 
 #statusLine{font-size:12.5px;min-height:17px;margin:0 0 10px;color:var(--muted)}
 
-#restSummary{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;
-  margin:0 0 10px;min-height:26px}
-.chip{background:#f2f4f6;border-radius:9px;padding:5px 10px;font-size:12px;
-  color:var(--muted);white-space:nowrap}
+#restSummary{display:flex;gap:6px;margin:0 0 10px;min-height:26px}
+.chip{flex:1;background:#f2f4f6;border-radius:9px;padding:6px 6px;font-size:12px;
+  color:var(--muted);text-align:center}
 .chip b{color:var(--fg);font-weight:650;font-variant-numeric:tabular-nums}
 .selrow{display:flex;gap:8px;margin:0 0 8px}
 .selrow label{flex:1;font-size:11.5px;color:var(--muted);display:flex;
@@ -208,10 +209,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
   <div class="srow"><span>Вес тела</span>
     <span><input type="number" id="setBody" min="35" max="160"> кг</span></div>
   <div class="sep"></div>
-  <div class="row" id="setOb">Показать обучение</div>
+  <div class="row" id="setOb">Как это работает</div>
 </div>
 <button class="btn" id="bDraw" title="Рисовать маршрут"><svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
 <button class="btn" id="bUndo" title="Отменить"><svg viewBox="0 0 24 24"><path d="M3 5v6h6"/><path d="M3.5 11a8.5 8.5 0 1 1 2.1 5.6"/></svg></button>
+<button class="btn" id="bSave" title="Сохранить маршрут"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
 <button class="btn" id="bClear" title="Стереть маршрут"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 
 <div id="layers">
@@ -260,7 +262,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
         <div class="tile"><div class="k">набор</div><div class="v" id="sGain">—</div></div>
         <div class="tile"><div class="k">сброс</div><div class="v" id="sLoss">—</div></div>
         <div class="tile"><div class="k">средний темп</div><div class="v" id="sPaceAvg">—</div></div>
-        <div class="tile"><div class="k">по плоской карте</div><div class="v" id="sNaive">—</div></div>
+        <div class="tile"><div class="k">без учёта рельефа</div><div class="v" id="sNaive">—</div></div>
       </div>
     </div>
   </div>
@@ -275,5 +277,5 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 </div>
 
 <script src="vendor/maplibre-gl.js"></script>
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body></html>

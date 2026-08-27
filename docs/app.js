@@ -383,7 +383,7 @@ function clearRoute(){
       map.getSource(id)?.setData({type:'FeatureCollection',features:[]}));
   });
   pill.classList.remove('on');
-  bUndo.classList.remove('on'); bClear.classList.remove('on');
+  bUndo.classList.remove('on'); bClear.classList.remove('on'); bSave.classList.remove('on');
   ['sGain','sLoss','sPaceAvg','sNaive'].forEach(id => document.getElementById(id).textContent = '—');
   document.getElementById('restSummary').innerHTML = '';
   document.getElementById('profVal').textContent = '';
@@ -468,7 +468,7 @@ function render(){
   pill.classList.add('on');
   pTime.textContent = fmtH(br.total);
   pSub.textContent = `${(S.dist/1000).toFixed(1)} км · ↑${Math.round(S.gain)} м · ↓${Math.round(S.loss)} м`;
-  bUndo.classList.add('on'); bClear.classList.add('on');
+  bUndo.classList.add('on'); bClear.classList.add('on'); bSave.classList.add('on');
 
   sGain.textContent = Math.round(S.gain) + ' м';
   sLoss.textContent = Math.round(S.loss) + ' м';
@@ -541,6 +541,7 @@ const pill = document.getElementById('pill');
 const pTime = document.getElementById('pTime');
 const pSub = document.getElementById('pSub');
 const bUndo = document.getElementById('bUndo'), bClear = document.getElementById('bClear');
+const bSave = document.getElementById('bSave');
 const bDraw = document.getElementById('bDraw');
 const sheet = document.getElementById('sheet');
 const statusLine = document.getElementById('statusLine');
@@ -578,11 +579,12 @@ function sheetTo(pos){
   if (pos !== 'hidden'){ closeLayers(); closeRoutes(); closeSettings(); }
   // кнопки рисования уезжают выше шторки, а в полной позиции прячутся
   const visible = pos === 'hidden' ? 0 : p.h - p[pos];
-  [bDraw, bUndo, bClear].forEach(b => b.classList.toggle('tucked', pos === 'full'));
+  [bDraw, bUndo, bClear, bSave].forEach(b => b.classList.toggle('tucked', pos === 'full'));
   const base = visible ? visible + 14 : 44;
   bDraw.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base}px)`;
   bUndo.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base + 68}px)`;
   bClear.style.bottom = `calc(env(safe-area-inset-bottom,0px) + ${base + 120}px)`;
+  bSave.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base + 172}px)`;
 }
 window.addEventListener('resize', () => sheetTo(SHEET.pos));
 
@@ -661,6 +663,7 @@ bUndo.onclick = () => {
   drawPreview();
   S.path.length > 1 ? recompute() : clearRoute();
 };
+bSave.onclick = () => saveCurrent();
 let clearArm = null;
 bClear.onclick = () => {
   if (clearArm){
@@ -737,8 +740,7 @@ function openRoute(o){
 function renderRoutes(){
   const list = loadRoutes();
   let html = S.path.length > 1
-    ? '<div class="row saveRow" id="rSave">Сохранить текущий маршрут</div>' +
-      '<div class="row saveRow" id="rShare">Поделиться ссылкой</div><div class="sep"></div>'
+    ? '<div class="row saveRow" id="rShare">Поделиться ссылкой</div><div class="sep"></div>'
     : '';
   html += '<div class="cap">Мои маршруты</div>';
   html += list.length ? list.map(o =>
@@ -748,8 +750,6 @@ function renderRoutes(){
       `<span class="rx" data-del="${o.id}">✕</span></div>`).join('')
     : '<div class="row" style="color:var(--muted)">Пока пусто — нарисуйте и сохраните</div>';
   routesEl.innerHTML = html;
-  const sv = document.getElementById('rSave');
-  if (sv) sv.onclick = saveCurrent;
   const sh = document.getElementById('rShare');
   if (sh) sh.onclick = shareRoute;
   routesEl.querySelectorAll('.rx').forEach(x => x.onclick = e => {
