@@ -15,9 +15,9 @@ function speedOf(slope, body, load, powerPerKg, terrain=1, loadFactor=1.15){
   const v    = (powerPerKg*body)/(cost*eff);
   return Math.max(MINV, Math.min(MAXV, v));
 }
-function timeHours(segs, body, load, powerPerKg){
+function timeHours(segs, body, load, powerPerKg, terrain = 1){
   let t = 0;
-  for (const [d, dh] of segs){ if (d > 0) t += d/speedOf(dh/d, body, load, powerPerKg); }
+  for (const [d, dh] of segs){ if (d > 0) t += d/speedOf(dh/d, body, load, powerPerKg, terrain); }
   return t/3600;
 }
 const naiveHours = m => m/1000/4;
@@ -80,7 +80,8 @@ const S = {
   dist: 0, gain: 0, loss: 0, sens: 0,
   body: +(localStorage.getItem('body') || 75),
   load: +(localStorage.getItem('load') || 10),
-  power: 3.6, draw: false, busy: false,
+  power: 3.6, terrain: +(localStorage.getItem('terrain') || 1),
+  draw: false, busy: false,
   base: 'topo', contours: false, speedColor: false, lastLen: 0
 };
 
@@ -432,7 +433,7 @@ function speedGradient(){
     if (i % every === 0 || i === S.segs.length-1){
       const p = Math.min(1, (cum + d/2)/S.dist);
       if (p > last + 1e-4){
-        stops.push(p, zoneColor(d > 0 ? speedOf(dh/d, S.body, S.load, S.power) : 1));
+        stops.push(p, zoneColor(d > 0 ? speedOf(dh/d, S.body, S.load, S.power, S.terrain) : 1));
         last = p;
       }
     }
@@ -450,7 +451,7 @@ function speedGradient(){
 
 function render(){
   const {segs, body, load, power} = S;
-  const t = timeHours(segs, body, load, power);
+  const t = timeHours(segs, body, load, power, S.terrain);
   const n = naiveHours(S.dist);
 
   pill.classList.add('on');
@@ -463,7 +464,7 @@ function render(){
   sLoss.textContent = Math.round(S.loss) + ' м';
   sPaceAvg.textContent = t > 0 ? (S.dist/1000/t).toFixed(1) + ' км/ч' : '—';
 
-  const t1 = timeHours(segs, body, load+1, power);
+  const t1 = timeHours(segs, body, load+1, power, S.terrain);
   S.sens = Math.round((t1-t)*60);
   updateWeightUI();
   speedGradient();
@@ -652,6 +653,16 @@ wSlider.oninput = () => {
   localStorage.setItem('load', S.load);
   if (S.segs.length) render(); else updateWeightUI();
 };
+document.querySelectorAll('#surf button').forEach(b => {
+  if (+b.dataset.t === S.terrain) b.classList.add('sel');
+  b.onclick = () => {
+    document.querySelectorAll('#surf button').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+    S.terrain = +b.dataset.t;
+    localStorage.setItem('terrain', S.terrain);
+    if (S.segs.length) render();
+  };
+});
 document.querySelectorAll('#pace button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#pace button').forEach(x => x.classList.remove('sel'));
   b.classList.add('sel'); S.power = +b.dataset.p;

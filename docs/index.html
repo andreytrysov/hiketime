@@ -116,10 +116,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 
 #statusLine{font-size:12.5px;min-height:17px;margin:0 0 10px;color:var(--muted)}
 
-#pace{display:flex;gap:6px;margin:0 0 8px}
-#pace button{flex:1;padding:9px;border-radius:10px;border:1px solid var(--line);
-  background:#fff;font-size:13.5px;cursor:pointer;color:var(--fg)}
-#pace button.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.segrow{display:flex;gap:6px;margin:0 0 8px}
+.segrow button{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--line);
+  background:#fff;font-size:13px;cursor:pointer;color:var(--fg)}
+.segrow button.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
 
 #analysis{border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
 #prof{width:100%;height:104px;display:block;touch-action:none}
@@ -196,7 +196,14 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
         <div id="ticks"></div>
       </div>
       <div id="statusLine"></div>
-      <div id="pace">
+      <div class="wrow"><span class="lbl">Покрытие</span></div>
+      <div class="segrow" id="surf">
+        <button data-t="1">Тропа</button>
+        <button data-t="1.55">Тундра, кусты</button>
+        <button data-t="1.9">Болото, камни</button>
+      </div>
+      <div class="wrow"><span class="lbl">Темп</span></div>
+      <div class="segrow" id="pace">
         <button data-p="3.0">Медленно</button>
         <button data-p="3.6" class="sel">Обычно</button>
         <button data-p="4.3">Быстро</button>
