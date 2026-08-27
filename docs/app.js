@@ -254,7 +254,7 @@ function endStroke(){
   cur = null;
   if (!what){
     drawPreview();
-    toast('Мазок далеко от маршрута — начните у его конца или поверх линии');
+    toast('Линия далеко от маршрута — начните у его конца или проведите поверх него');
     return;
   }
   S.history.push(before);
@@ -363,6 +363,8 @@ async function recompute(){
   });
   S.busy = false;
   render();
+  // после первой нарисованной линии настройки веса всплывают сами
+  if (SHEET.pos === 'hidden') sheetTo('half');
 }
 
 function clearRoute(){
