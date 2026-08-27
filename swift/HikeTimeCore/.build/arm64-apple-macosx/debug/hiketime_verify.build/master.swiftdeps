@@ -1,5 +1,5 @@
 version: "Apple Swift version 5.10 (swiftlang-5.10.0.13 clang-1500.3.9.4)"
 options: "c19a935ac866731b5e7db2e005c2b622"
-build_time: [1787855258, 104914000]
+build_time: [1787856476, 117852000]
 inputs:
-  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/hiketime-verify/main.swift": [1787855257, 204202260]
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/hiketime-verify/main.swift": [1787856474, 700812580]

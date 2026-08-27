@@ -138,5 +138,32 @@ check(near(track.elapsedHours ?? 0, 2.5, rel: 1e-9), "полное время 2:
 // вторая точка стоит на месте 20 минут — движение должно её выбросить
 check((track.movingHours() ?? 0) < 2.2, "привал вычтен из времени движения")
 
+print("редактирование маршрута (сценарии, выверенные на веб-прототипе):")
+typealias P = RouteEditing.P
+var path: [P] = []
+check(RouteEditing.applyStroke([P(400,300),P(400,700),P(400,1300)], to: &path) == .started
+      && path.count == 3, "первый мазок начинает маршрут")
+check(RouteEditing.applyStroke([P(900,1400),P(950,1450)], to: &path) == .rejected
+      && path.count == 3, "далёкий мазок отклонён")
+check(RouteEditing.applyStroke([P(400,500),P(550,700),P(400,900)], to: &path) == .replacedSegment,
+      "перечёркивание заменяет участок")
+let before = path.count
+check(RouteEditing.applyStroke([P(400,1300),P(460,1380)], to: &path) == .extended
+      && path.count == before + 2, "продление с хвоста")
+check(RouteEditing.applyStroke([P(400,300),P(340,240)], to: &path) == .extended
+      && path[0] == P(340,240), "продление с головы (мазок развёрнут)")
+
+var knife: [P] = [P(0,0),P(100,0),P(200,0),P(300,0),P(400,0)]
+check(RouteEditing.eraseCut([P(250,10)], path: &knife) == .trimmed
+      && knife.count == 4 && knife[3] == P(250,0), "нож: рез в середине, хвост стёрт")
+check(RouteEditing.eraseCut([P(500,300)], path: &knife) == .missed, "нож мимо линии")
+check(RouteEditing.eraseCut([P(0,5)], path: &knife) == .cleared && knife.isEmpty,
+      "нож у начала стирает всё")
+
+let zig: [P] = [P(0,0),P(3,1),P(6,0),P(10,2),P(50,0),P(100,0)]
+let simp = RouteEditing.simplify(zig, tolerance: 5)
+check(simp.first == zig.first && simp.last == zig.last && simp.count < zig.count,
+      "упрощение держит концы и убирает шум")
+
 print(failed == 0 ? "\nВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "\nПРОВАЛЕНО: \(failed)")
 exit(failed == 0 ? 0 : 1)

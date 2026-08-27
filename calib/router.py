@@ -5,7 +5,7 @@ Overpass, строим кратчайший путь Дейкстрой. Это 
 с серпантинами — рисованные от руки точки спрямляют тропу и занижают
 дистанцию, на этом мы уже обжигались.
 """
-import heapq, json, math, os, ssl, time, urllib.parse, urllib.request
+import hashlib, heapq, json, math, os, ssl, time, urllib.parse, urllib.request
 import certifi
 
 CACHE = os.path.join(os.path.dirname(__file__), "overpass_cache")
@@ -15,7 +15,8 @@ FOOT = "path|footway|track|steps|bridleway|unclassified|residential|service|pede
 
 def _fetch(query):
     os.makedirs(CACHE, exist_ok=True)
-    key = os.path.join(CACHE, f"{abs(hash(query))}.json")
+    # hash() в Python рандомизирован между процессами — только md5
+    key = os.path.join(CACHE, hashlib.md5(query.encode()).hexdigest() + ".json")
     if os.path.exists(key):
         return json.load(open(key))
     ctx = ssl.create_default_context(cafile=certifi.where())

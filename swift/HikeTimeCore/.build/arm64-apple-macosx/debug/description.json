@@ -136,6 +136,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteEditing.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift"
         },
         {
@@ -155,6 +159,7 @@
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/GPX.swift.o",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/RouteBuilder.swift.o",
+        "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/RouteEditing.swift.o",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o"
       ],
       "otherArguments" : [
@@ -211,6 +216,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/RouteEditing.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o"
         },
         {
@@ -223,6 +232,7 @@
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/GPX.swift",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteBuilder.swift",
+        "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteEditing.swift",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift"
       ],
       "tempsPath" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build",
@@ -381,6 +391,7 @@
       "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/GPX.swift",
       "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift",
       "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteBuilder.swift",
+      "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteEditing.swift",
       "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift",
       "-I",
       "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug",
@@ -535,6 +546,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/RouteEditing.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o"
         },
         {
@@ -569,6 +584,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteEditing.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift"
         }
       ],
@@ -596,6 +615,10 @@
         {
           "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/RouteBuilder.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/RouteEditing.swift.o"
         },
         {
           "kind" : "file",
