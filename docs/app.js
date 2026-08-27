@@ -151,7 +151,8 @@ function addRouteLayers(){
     layout:{'line-cap':'round','line-join':'round'} });
   map.addLayer({ id:'route-line', type:'line', source:'route',
     paint:{'line-color':['case', ['coalesce',['get','erase'],false], '#a33a2a', '#2f6f4f'],
-           'line-width':4},
+           'line-width':['case', ['coalesce',['get','erase'],false], 16, 4],
+           'line-opacity':['case', ['coalesce',['get','erase'],false], 0.5, 1]},
     layout:{'line-cap':'round','line-join':'round'} });
   map.addLayer({ id:'route-spd', type:'line', source:'spd',
     layout:{visibility:'none','line-cap':'round','line-join':'round'},
@@ -265,34 +266,36 @@ function applyStroke(strokePx){
   return 'продлено';
 }
 
-/* Ластик. Стирает только от концов: вырезание середины разорвало бы маршрут,
-   а молчаливое соединение краёв прямой — ровно та перемычка, от которой ушли.
-   Середину правят перечёркиванием. */
+/* Ластик-нож: первое (по ходу маршрута) место, которого коснулся след,
+   становится новым концом — всё после него стирается. Одно касание,
+   один предсказуемый результат. */
 function eraseStroke(strokePx){
   if (S.path.length < 2) return;
   const pathPx = S.path.map(c => { const p = map.project(c); return [p.x, p.y]; });
-  const R = 32;
-  const near = i => {
-    for (let j = 0; j < strokePx.length - 1; j++)
-      if (projOnSeg(pathPx[i], strokePx[j], strokePx[j+1]).d < R) return true;
-    return strokePx.length === 1
-      ? Math.hypot(pathPx[i][0]-strokePx[0][0], pathPx[i][1]-strokePx[0][1]) < R
-      : false;
-  };
-  let a = 0;
-  while (a < S.path.length && near(a)) a++;
-  let b = S.path.length - 1;
-  while (b >= 0 && near(b)) b--;
-  if (a === 0 && b === S.path.length - 1){
-    toast('Ластик стирает от конца маршрута. Середину проще перечеркнуть новой линией');
+  const R = 34;
+  let best = null;
+  for (const sp of strokePx){
+    const n = nearestOnPolyline(sp, pathPx);
+    if (n.d < R && (!best || n.i + n.t < best.i + best.t)) best = n;
+  }
+  if (!best){
     drawPreview();
+    toast('Проведите ластиком по линии — всё после этого места сотрётся');
     return;
   }
   S.history.push(S.path.slice());
   if (S.history.length > 40) S.history.shift();
   S.savedId = null;
-  S.path = a > b ? [] : S.path.slice(a, b + 1);
-  if (S.path.length < 2){ clearRoute(); return; }
+  const cut = lerpLL(S.path[best.i], S.path[best.i+1], best.t);
+  const np = S.path.slice(0, best.i + 1);
+  if (haversine(np[np.length-1], cut) > 1) np.push(cut);
+  if (np.length < 2){          // коснулись у самого начала — стёрлось всё
+    S.path = [];
+    drawPreview();
+    clearRoute(true);          // историю бережём: отмена вернёт маршрут
+    return;
+  }
+  S.path = np;
   drawPreview();
   recompute();
 }
@@ -421,9 +424,10 @@ async function recompute(){
   if (SHEET.pos === 'hidden') sheetTo('half');
 }
 
-function clearRoute(){
-  Object.assign(S, {path:[], history:[], pts:[], ele:[], segs:[], dist:0, gain:0, loss:0,
+function clearRoute(keepHistory){
+  Object.assign(S, {path:[], pts:[], ele:[], segs:[], dist:0, gain:0, loss:0,
     routeName:null, savedId:null});
+  if (!keepHistory) S.history = [];
   pName.style.display = 'none';
   whenReady(() => {
     ['route','spd','cur','ends'].forEach(id =>
@@ -702,7 +706,7 @@ document.querySelectorAll('#layers .row').forEach(row => row.onclick = () => {
 bErase.onclick = () => {
   S.erase = !S.erase;
   bErase.classList.toggle('on', S.erase);
-  toast(S.erase ? 'Ластик: проведите вдоль конца маршрута' : 'Снова рисование');
+  toast(S.erase ? 'Коснитесь линии — всё после этого места сотрётся' : 'Снова рисование');
 };
 bDraw.onclick = function(){
   S.draw = !S.draw;

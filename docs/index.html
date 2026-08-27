@@ -67,6 +67,9 @@ html,body{margin:0;height:100vh;height:100dvh;overflow:hidden;
 .btn:active{transform:scale(.94)}
 .btn.on{background:var(--accent);color:#fff}
 .btn.done{background:var(--accent);color:#fff}
+.btn .ic2{display:none}
+.btn.done .ic1{display:none}
+.btn.done .ic2{display:block}
 #bLayers{right:12px;top:calc(var(--safe-top) + 12px)}
 #bDraw{right:12px;bottom:calc(var(--safe-bot) + 44px);width:56px;height:56px;
   border-radius:16px;font-size:23px}
@@ -98,7 +101,7 @@ html,body{margin:0;height:100vh;height:100dvh;overflow:hidden;
 #layers .sep,#routes .sep,#settings .sep{height:1px;background:var(--line);margin:5px 8px}
 #routes .saveRow{color:var(--accent);font-weight:600}
 #routes .meta{font-size:11px;color:var(--muted)}
-#routes .rx{color:var(--muted);padding:2px 7px;font-size:15px;flex:0 0 auto}
+#routes .rx{color:var(--danger);font-weight:600;padding:2px 7px;font-size:15px;flex:0 0 auto}
 #layers .cap,#routes .cap,#settings .cap{font-size:11px;color:var(--muted);padding:5px 11px 2px;
   text-transform:uppercase;letter-spacing:.05em}
 
@@ -220,10 +223,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
   <div class="sep"></div>
   <div class="row" id="setOb">Как это работает</div>
 </div>
-<button class="btn" id="bErase" title="Ластик — стирать от конца"><svg viewBox="0 0 24 24"><path d="m7 21-4.3-4.3a2.4 2.4 0 0 1 0-3.4l9.6-9.6a2.4 2.4 0 0 1 3.4 0l5.6 5.6a2.4 2.4 0 0 1 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 8 8"/></svg></button>
+<button class="btn" id="bErase" title="Ластик — обрезать маршрут"><svg viewBox="0 0 24 24"><path d="m7 21-4.3-4.3a2.4 2.4 0 0 1 0-3.4l9.6-9.6a2.4 2.4 0 0 1 3.4 0l5.6 5.6a2.4 2.4 0 0 1 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 8 8"/></svg></button>
 <button class="btn" id="bDraw" title="Рисовать маршрут"><svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
 <button class="btn" id="bUndo" title="Отменить"><svg viewBox="0 0 24 24"><path d="M3 5v6h6"/><path d="M3.5 11a8.5 8.5 0 1 1 2.1 5.6"/></svg></button>
-<button class="btn" id="bSave" title="Сохранить маршрут"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></button>
+<button class="btn" id="bSave" title="Сохранить маршрут"><svg class="ic1" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><svg class="ic2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>
 <button class="btn" id="bClear" title="Стереть маршрут"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 
 <div id="layers">
@@ -287,5 +290,5 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 </div>
 
 <script src="vendor/maplibre-gl.js"></script>
-<script src="app.js?v=17"></script>
+<script src="app.js?v=19"></script>
 </body></html>
