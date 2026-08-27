@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Время в пути — прототип</title>
+<link href="vendor/maplibre-gl.css" rel="stylesheet">
+<script src="vendor/maplibre-gl.js"></script>
+<style>
+:root{
+  --bg:#fff; --fg:#12161c; --muted:#6b7480; --line:#e3e6ea;
+  --accent:#2f6f4f; --warn:#b8860b; --danger:#a33a2a;
+  --sheet:#fff; --shadow:0 6px 24px rgba(0,0,0,.16);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;
+  font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;
+  color:var(--fg);background:var(--bg)}
+#map{position:absolute;inset:0}
+
+/* ---- плашка результата: сверху, потому что при рисовании низ закрыт рукой ---- */
+#pill{position:absolute;left:50%;transform:translateX(-50%);
+  top:calc(var(--safe-top) + 12px);z-index:6;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+  border-radius:16px;box-shadow:var(--shadow);padding:9px 16px;
+  text-align:center;min-width:150px;display:none;cursor:pointer}
+#pill.on{display:block}
+#pill .t{font-size:30px;font-weight:650;letter-spacing:-.02em;line-height:1.05;
+  font-variant-numeric:tabular-nums}
+#pill .naive{font-size:11.5px;color:var(--muted);margin-top:2px}
+#pill .naive b{color:var(--danger);font-weight:600}
+#pill .sub{font-size:11.5px;color:var(--muted);margin-top:3px;
+  border-top:1px solid var(--line);padding-top:4px;font-variant-numeric:tabular-nums}
+
+/* ---- кнопки ---- */
+.btn{position:absolute;z-index:5;width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);box-shadow:var(--shadow);
+  border:0;display:grid;place-items:center;font-size:19px;cursor:pointer;color:var(--fg)}
+.btn:active{transform:scale(.94)}
+.btn.on{background:var(--accent);color:#fff}
+#bLayers{right:12px;top:calc(var(--safe-top) + 12px)}
+#bDraw{right:12px;bottom:calc(var(--safe-bot) + 96px);width:56px;height:56px;
+  border-radius:16px;font-size:23px}
+#bUndo{right:12px;bottom:calc(var(--safe-bot) + 160px);display:none}
+#bUndo.on{display:grid}
+#bClear{right:12px;bottom:calc(var(--safe-bot) + 212px);display:none}
+#bClear.on{display:grid}
+
+#layers{position:absolute;right:12px;top:calc(var(--safe-top) + 64px);z-index:7;
+  background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:6px;display:none;width:210px}
+#layers.on{display:block}
+#layers .row{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;
+  display:flex;justify-content:space-between;align-items:center}
+#layers .row:hover{background:#f4f6f7}
+#layers .row.sel{background:#eef4f0;color:var(--accent);font-weight:600}
+#layers .sep{height:1px;background:var(--line);margin:5px 8px}
+#layers .cap{font-size:11px;color:var(--muted);padding:5px 11px 2px;
+  text-transform:uppercase;letter-spacing:.05em}
+
+/* ---- шторка ---- */
+#sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;background:var(--sheet);
+  border-radius:18px 18px 0 0;box-shadow:0 -6px 28px rgba(0,0,0,.14);
+  padding:8px 16px calc(var(--safe-bot) + 14px);
+  transform:translateY(calc(100% - 74px));transition:transform .28s cubic-bezier(.3,.8,.3,1)}
+#sheet.open{transform:translateY(0)}
+#grip{width:38px;height:4px;border-radius:2px;background:#d3d8dd;margin:4px auto 10px;cursor:pointer}
+#sheet .hint{text-align:center;font-size:13px;color:var(--muted);margin:-4px 0 8px}
+
+.wrow{display:flex;align-items:baseline;justify-content:space-between;margin:2px 0 6px}
+.wrow .lbl{font-size:13px;color:var(--muted)}
+.wrow .val{font-size:17px;font-weight:650;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+#band{height:6px;border-radius:3px;margin:7px 0 4px;
+  background:linear-gradient(90deg,#7fae8e 0 25%,#c9c07a 25% 50%,#d9a05b 50% 62.5%,#c4705c 62.5% 75%,#a33a2a 75% 100%)}
+#bandTxt{font-size:12.5px;color:var(--muted);margin-bottom:10px;min-height:17px}
+#sens{font-size:13px;color:var(--fg);background:#f4f6f7;border-radius:9px;
+  padding:8px 11px;margin-bottom:11px}
+#sens b{color:var(--accent)}
+
+#prof{width:100%;height:104px;display:block;touch-action:none}
+#profTxt{font-size:12px;color:var(--muted);text-align:center;min-height:16px;margin-top:2px}
+
+#stats{display:flex;flex-wrap:wrap;gap:5px 0;margin:10px 0 4px}
+#stats div{flex:1 0 33%;text-align:center}
+#stats .k{font-size:11px;color:var(--muted)}
+#stats .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+
+#pace{display:flex;gap:6px;margin:10px 0 2px}
+#pace button{flex:1;padding:9px;border-radius:10px;border:1px solid var(--line);
+  background:#fff;font-size:13.5px;cursor:pointer;color:var(--fg)}
+#pace button.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+
+/* ---- онбординг ---- */
+#ob{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;
+  flex-direction:column;padding:calc(var(--safe-top) + 28px) 24px calc(var(--safe-bot) + 22px)}
+#ob.on{display:flex}
+#ob .body{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:440px;
+  margin:0 auto;width:100%}
+#ob h2{font-size:25px;line-height:1.22;margin:0 0 12px;letter-spacing:-.02em}
+#ob p{color:var(--muted);margin:0 0 20px;font-size:15px}
+#ob .cmp{display:flex;gap:12px;margin:6px 0 4px}
+#ob .cmp>div{flex:1;border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center}
+#ob .cmp .k{font-size:11.5px;color:var(--muted);margin-bottom:5px}
+#ob .cmp .v{font-size:29px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+#ob .cmp .bad .v{color:var(--danger)}
+#ob .cmp .good .v{color:var(--accent)}
+#ob .note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:10px}
+#ob .big{font-size:38px;font-weight:650;text-align:center;font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;margin:14px 0 2px}
+#ob .nav{display:flex;gap:10px;align-items:center;max-width:440px;margin:0 auto;width:100%}
+#ob .nav button{flex:1;padding:14px;border-radius:13px;border:0;background:var(--accent);
+  color:#fff;font-size:15.5px;font-weight:600;cursor:pointer}
+#ob .nav .skip{flex:0 0 auto;background:none;color:var(--muted);font-weight:400;padding:14px 6px}
+#dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
+#dots i{width:6px;height:6px;border-radius:3px;background:var(--line)}
+#dots i.on{background:var(--accent);width:18px}
+#ob input[type=number]{width:100%;padding:13px;font-size:17px;border:1px solid var(--line);
+  border-radius:12px;text-align:center;font-variant-numeric:tabular-nums}
+
+.maplibregl-ctrl-attrib{font-size:9.5px}
+</style></head>
+<body>
+<div id="map"></div>
+
+<div id="pill">
+  <div class="t" id="pTime">—</div>
+  <div class="naive">обычный расчёт: <b id="pNaive">—</b></div>
+  <div class="sub" id="pSub"></div>
+</div>
+
+<button class="btn" id="bLayers" title="Слои">◈</button>
+<button class="btn" id="bDraw" title="Рисовать маршрут">✎</button>
+<button class="btn" id="bUndo" title="Отменить мазок">↶</button>
+<button class="btn" id="bClear" title="Стереть маршрут">✕</button>
+
+<div id="layers">
+  <div class="cap">Подложка</div>
+  <div class="row sel" data-base="topo">Топо <span>оффлайн</span></div>
+  <div class="row" data-base="plain">Обычная <span>оффлайн</span></div>
+  <div class="row" data-base="sat">Спутник <span>онлайн</span></div>
+  <div class="sep"></div>
+  <div class="cap">Поверх</div>
+  <div class="row" data-ov="contours">Горизонтали</div>
+  <div class="row" data-ov="speed">Скорость по треку</div>
+</div>
+
+<div id="sheet">
+  <div id="grip"></div>
+  <div class="hint" id="hint">Нажмите карандаш и обведите маршрут пальцем</div>
+
+  <div class="wrow"><span class="lbl">Рюкзак</span><span class="val" id="wVal">10 кг</span></div>
+  <input type="range" id="wSlider" min="0" max="40" step="1" value="10">
+  <div id="band"></div>
+  <div id="bandTxt"></div>
+
+  <div id="sens">Каждый лишний килограмм: <b id="sensVal">—</b></div>
+
+  <svg id="prof" viewBox="0 0 340 104" preserveAspectRatio="none"></svg>
+  <div id="profTxt">Коснитесь графика — точка подсветится на карте</div>
+
+  <div id="stats">
+    <div><div class="k">расстояние</div><div class="v" id="sDist">—</div></div>
+    <div><div class="k">набор</div><div class="v" id="sGain">—</div></div>
+    <div><div class="k">сброс</div><div class="v" id="sLoss">—</div></div>
+  </div>
+
+  <div id="pace">
+    <button data-p="3.0">Медленно</button>
+    <button data-p="3.6" class="sel">Обычно</button>
+    <button data-p="4.3">Быстро</button>
+  </div>
+</div>
+
+<div id="ob"><div class="body" id="obBody"></div>
+  <div id="dots"><i class="on"></i><i></i><i></i></div>
+  <div class="nav"><button class="skip" id="obSkip">Пропустить</button>
+    <button id="obNext">Дальше</button></div>
+</div>
+
+<script src="app.js"></script>
+</body></html>
