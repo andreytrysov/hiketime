@@ -90,7 +90,7 @@ const S = {
   body: +(localStorage.getItem('body') || 75),
   load: +(localStorage.getItem('load') || 10),
   power: 3.6, terrain: +(localStorage.getItem('terrain') || 1),
-  draw: false, busy: false,
+  draw: false, erase: false, busy: false,
   base: 'topo', contours: false, speedColor: false, lastLen: 0
 };
 
@@ -150,7 +150,8 @@ function addRouteLayers(){
     paint:{'line-color':'#fff','line-width':7,'line-opacity':.85},
     layout:{'line-cap':'round','line-join':'round'} });
   map.addLayer({ id:'route-line', type:'line', source:'route',
-    paint:{'line-color':'#2f6f4f','line-width':4},
+    paint:{'line-color':['case', ['coalesce',['get','erase'],false], '#a33a2a', '#2f6f4f'],
+           'line-width':4},
     layout:{'line-cap':'round','line-join':'round'} });
   map.addLayer({ id:'route-spd', type:'line', source:'spd',
     layout:{visibility:'none','line-cap':'round','line-join':'round'},
@@ -264,9 +265,42 @@ function applyStroke(strokePx){
   return 'продлено';
 }
 
+/* Ластик. Стирает только от концов: вырезание середины разорвало бы маршрут,
+   а молчаливое соединение краёв прямой — ровно та перемычка, от которой ушли.
+   Середину правят перечёркиванием. */
+function eraseStroke(strokePx){
+  if (S.path.length < 2) return;
+  const pathPx = S.path.map(c => { const p = map.project(c); return [p.x, p.y]; });
+  const R = 32;
+  const near = i => {
+    for (let j = 0; j < strokePx.length - 1; j++)
+      if (projOnSeg(pathPx[i], strokePx[j], strokePx[j+1]).d < R) return true;
+    return strokePx.length === 1
+      ? Math.hypot(pathPx[i][0]-strokePx[0][0], pathPx[i][1]-strokePx[0][1]) < R
+      : false;
+  };
+  let a = 0;
+  while (a < S.path.length && near(a)) a++;
+  let b = S.path.length - 1;
+  while (b >= 0 && near(b)) b--;
+  if (a === 0 && b === S.path.length - 1){
+    toast('Ластик стирает от конца маршрута. Середину проще перечеркнуть новой линией');
+    drawPreview();
+    return;
+  }
+  S.history.push(S.path.slice());
+  if (S.history.length > 40) S.history.shift();
+  S.savedId = null;
+  S.path = a > b ? [] : S.path.slice(a, b + 1);
+  if (S.path.length < 2){ clearRoute(); return; }
+  drawPreview();
+  recompute();
+}
+
 function endStroke(){
   if (!cur || cur.length < 2){ cur = null; return; }
   const simp = simplifyPx(cur, 2.5);
+  if (S.erase){ const st = simp; cur = null; eraseStroke(st); return; }
   const before = S.path.slice();
   const what = applyStroke(simp);
   cur = null;
@@ -285,7 +319,8 @@ function drawPreview(){
   const feats = [];
   if (S.path.length > 1) feats.push({type:'Feature',geometry:{type:'LineString',coordinates:S.path}});
   if (cur && cur.length > 1){
-    feats.push({ type:'Feature', geometry:{ type:'LineString',
+    feats.push({ type:'Feature', properties:{erase: S.erase},
+      geometry:{ type:'LineString',
       coordinates: cur.map(([x,y]) => { const c = map.unproject([x,y]); return [c.lng,c.lat]; }) }});
   }
   whenReady(() => {
@@ -559,6 +594,7 @@ const pName = document.getElementById('pName');
 const pSub = document.getElementById('pSub');
 const bUndo = document.getElementById('bUndo'), bClear = document.getElementById('bClear');
 const bSave = document.getElementById('bSave');
+const bErase = document.getElementById('bErase');
 const bDraw = document.getElementById('bDraw');
 const sheet = document.getElementById('sheet');
 const statusLine = document.getElementById('statusLine');
@@ -596,9 +632,10 @@ function sheetTo(pos){
   if (pos !== 'hidden'){ closeLayers(); closeRoutes(); closeSettings(); }
   // кнопки рисования уезжают выше шторки, а в полной позиции прячутся
   const visible = pos === 'hidden' ? 0 : p.h - p[pos];
-  [bDraw, bUndo, bClear, bSave].forEach(b => b.classList.toggle('tucked', pos === 'full'));
+  [bDraw, bUndo, bClear, bSave, bErase].forEach(b => b.classList.toggle('tucked', pos === 'full'));
   const base = visible ? visible + 14 : 44;
   bDraw.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base}px)`;
+  bErase.style.bottom = `calc(env(safe-area-inset-bottom,0px) + ${base}px)`;
   bUndo.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base + 68}px)`;
   bClear.style.bottom = `calc(env(safe-area-inset-bottom,0px) + ${base + 120}px)`;
   bSave.style.bottom  = `calc(env(safe-area-inset-bottom,0px) + ${base + 172}px)`;
@@ -662,9 +699,16 @@ document.querySelectorAll('#layers .row').forEach(row => row.onclick = () => {
 });
 
 // ---------- рисование ----------
+bErase.onclick = () => {
+  S.erase = !S.erase;
+  bErase.classList.toggle('on', S.erase);
+  toast(S.erase ? 'Ластик: проведите вдоль конца маршрута' : 'Снова рисование');
+};
 bDraw.onclick = function(){
   S.draw = !S.draw;
   this.classList.toggle('on', S.draw);
+  bErase.classList.toggle('shown', S.draw);
+  if (!S.draw){ S.erase = false; bErase.classList.remove('on'); }
   map.dragPan[S.draw ? 'disable' : 'enable']();
   if (S.draw){
     sheetTo('hidden');
