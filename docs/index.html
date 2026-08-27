@@ -166,6 +166,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
   border-radius:12px;text-align:center;font-variant-numeric:tabular-nums}
 
 .maplibregl-ctrl-attrib{font-size:9.5px}
+/* на тачах зум — щипком и двойным тапом, кнопки только занимают место */
+@media (pointer:coarse){
+  .maplibregl-ctrl-zoom-in,.maplibregl-ctrl-zoom-out{display:none}
+}
 </style></head>
 <body>
 <div id="map"></div>

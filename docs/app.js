@@ -660,7 +660,21 @@ bUndo.onclick = () => {
   drawPreview();
   S.path.length > 1 ? recompute() : clearRoute();
 };
-bClear.onclick = () => clearRoute();
+let clearArm = null;
+bClear.onclick = () => {
+  if (clearArm){
+    clearTimeout(clearArm); clearArm = null;
+    bClear.style.background = ''; bClear.style.color = '';
+    clearRoute();
+    return;
+  }
+  bClear.style.background = '#a33a2a'; bClear.style.color = '#fff';
+  toast('Ещё раз — стереть маршрут целиком');
+  clearArm = setTimeout(() => {
+    clearArm = null;
+    bClear.style.background = ''; bClear.style.color = '';
+  }, 2600);
+};
 
 // ---------- вес и темп ----------
 wSlider.value = S.load;
@@ -722,7 +736,8 @@ function openRoute(o){
 function renderRoutes(){
   const list = loadRoutes();
   let html = S.path.length > 1
-    ? '<div class="row saveRow" id="rSave">Сохранить текущий маршрут</div><div class="sep"></div>'
+    ? '<div class="row saveRow" id="rSave">Сохранить текущий маршрут</div>' +
+      '<div class="row saveRow" id="rShare">Поделиться ссылкой</div><div class="sep"></div>'
     : '';
   html += '<div class="cap">Мои маршруты</div>';
   html += list.length ? list.map(o =>
@@ -734,6 +749,8 @@ function renderRoutes(){
   routesEl.innerHTML = html;
   const sv = document.getElementById('rSave');
   if (sv) sv.onclick = saveCurrent;
+  const sh = document.getElementById('rShare');
+  if (sh) sh.onclick = shareRoute;
   routesEl.querySelectorAll('.rx').forEach(x => x.onclick = e => {
     e.stopPropagation();
     persistRoutes(loadRoutes().filter(o => o.id !== +x.dataset.del));
@@ -743,6 +760,69 @@ function renderRoutes(){
     const o = loadRoutes().find(q => q.id === +r.dataset.id);
     if (o) openRoute(o);
   });
+}
+
+// ---------- маршрут в ссылке (кодирование Google polyline) ----------
+function encPolyline(path){
+  let out = '', pLat = 0, pLng = 0;
+  const enc = v => {
+    v = v < 0 ? ~(v << 1) : v << 1;
+    let r = '';
+    while (v >= 0x20){ r += String.fromCharCode((0x20 | (v & 0x1f)) + 63); v >>= 5; }
+    return r + String.fromCharCode(v + 63);
+  };
+  for (const [lng, lat] of path){
+    const la = Math.round(lat*1e5), ln = Math.round(lng*1e5);
+    out += enc(la - pLat) + enc(ln - pLng);
+    pLat = la; pLng = ln;
+  }
+  return out;
+}
+function decPolyline(str){
+  let i = 0, lat = 0, lng = 0;
+  const out = [];
+  const dec = () => {
+    let sh = 0, res = 0, b;
+    do { b = str.charCodeAt(i++) - 63; res |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
+    return (res & 1) ? ~(res >> 1) : res >> 1;
+  };
+  while (i < str.length){ lat += dec(); lng += dec(); out.push([lng/1e5, lat/1e5]); }
+  return out;
+}
+
+async function shareRoute(){
+  if (S.path.length < 2) return;
+  const u = location.origin + location.pathname +
+    '#r=' + encodeURIComponent(encPolyline(S.path)) +
+    '&w=' + S.load + '&t=' + S.terrain + '&p=' + S.power;
+  if (navigator.share){
+    try { await navigator.share({title: 'Маршрут', url: u}); return; } catch(e){}
+  }
+  try { await navigator.clipboard.writeText(u); toast('Ссылка скопирована'); }
+  catch(e){ prompt('Скопируйте ссылку:', u); }
+}
+
+function tryOpenShared(){
+  const h = location.hash.slice(1);
+  if (!h || h === 'ob') return false;
+  const q = new URLSearchParams(h);
+  const r = q.get('r');
+  if (!r) return false;
+  try {
+    const path = decPolyline(r);
+    if (path.length < 2) return false;
+    S.path = path;
+    if (q.get('w')){ S.load = +q.get('w'); wSlider.value = S.load; }
+    if (q.get('t')){ S.terrain = +q.get('t'); surfSel.value = String(S.terrain); }
+    if (q.get('p')){ S.power = +q.get('p'); paceSel.value = String(S.power); }
+    updateWeightUI();
+    drawPreview(); recompute();
+    const lons = path.map(p => p[0]), lats = path.map(p => p[1]);
+    whenReady(() => map.fitBounds(
+      [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]],
+      {padding: 70}));
+    return true;
+  } catch(e){ return false; }
 }
 
 function closeRoutes(){ routesEl.classList.remove('on'); updatePillVis(); }
@@ -816,7 +896,13 @@ updateWeightUI();
 updateEmptyHint();
 applyLayers();
 
+const sharedOpened = tryOpenShared();
+// ссылку могут вставить в уже открытую вкладку — тогда перезагрузки не будет
+window.addEventListener('hashchange', () => tryOpenShared());
 fetch('sample.json').then(r => r.json()).then(j => {
   sample = j;
-  if (!localStorage.getItem('onboarded') || location.hash === '#ob'){ ob.classList.add('on'); obRender(); }
+  if (!sharedOpened &&
+      (!localStorage.getItem('onboarded') || location.hash === '#ob')){
+    ob.classList.add('on'); obRender();
+  }
 });
