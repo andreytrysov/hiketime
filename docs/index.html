@@ -23,14 +23,14 @@ html,body{margin:0;height:100%;overflow:hidden;
 #pill{position:absolute;left:50%;transform:translateX(-50%);
   top:calc(var(--safe-top) + 12px);z-index:6;
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
-  border-radius:16px;box-shadow:var(--shadow);padding:9px 16px;
-  text-align:center;min-width:150px;display:none;cursor:pointer}
+  border-radius:16px;box-shadow:var(--shadow);padding:9px 18px;
+  text-align:center;min-width:150px;max-width:calc(100vw - 110px);display:none;cursor:pointer}
 #pill.on{display:block}
 #pill .t{font-size:30px;font-weight:650;letter-spacing:-.02em;line-height:1.05;
   font-variant-numeric:tabular-nums}
 #pill .naive{font-size:11.5px;color:var(--muted);margin-top:2px}
 #pill .naive b{color:var(--danger);font-weight:600}
-#pill .sub{font-size:11.5px;color:var(--muted);margin-top:3px;
+#pill .sub{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;
   border-top:1px solid var(--line);padding-top:4px;font-variant-numeric:tabular-nums}
 
 /* ---- кнопки ---- */

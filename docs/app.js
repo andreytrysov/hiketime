@@ -78,7 +78,7 @@ function gainLoss(ele, thr=2){
 
 // ---------- состояние ----------
 const S = {
-  strokes: [], pts: [], ele: [], segs: [],
+  path: [], history: [], pts: [], ele: [], segs: [],
   dist: 0, gain: 0, loss: 0,
   body: +(localStorage.getItem('body') || 75),
   load: +(localStorage.getItem('load') || 10),
@@ -122,6 +122,7 @@ function addRouteLayers(){
   map.addSource('route', { type:'geojson', data:{type:'FeatureCollection',features:[]} });
   map.addSource('segs',  { type:'geojson', data:{type:'FeatureCollection',features:[]} });
   map.addSource('cur',   { type:'geojson', data:{type:'FeatureCollection',features:[]} });
+  map.addSource('ends',  { type:'geojson', data:{type:'FeatureCollection',features:[]} });
 
   map.addLayer({ id:'route-halo', type:'line', source:'route',
     paint:{'line-color':'#fff','line-width':7,'line-opacity':.85},
@@ -134,6 +135,9 @@ function addRouteLayers(){
     paint:{'line-width':5,'line-color':
       ['interpolate',['linear'],['get','v'],
         0.3,'#a33a2a', 0.7,'#d9a05b', 1.1,'#c9c07a', 1.4,'#2f6f4f']} });
+  map.addLayer({ id:'end-pt', type:'circle', source:'ends',
+    paint:{'circle-radius':5.5,'circle-color':'#2f6f4f',
+           'circle-stroke-color':'#fff','circle-stroke-width':2.5} });
   map.addLayer({ id:'cur-pt', type:'circle', source:'cur',
     paint:{'circle-radius':6,'circle-color':'#12161c','circle-stroke-color':'#fff','circle-stroke-width':2.5} });
   applyLayers();
@@ -153,20 +157,101 @@ function extendStroke(x, y){
   if ((x-p[0])**2 + (y-p[1])**2 > 4) cur.push([x, y]);   // не копим дрожь пальца
   drawPreview();
 }
+const SNAP_PX = 45;   // насколько близко мазок должен подойти, чтобы приклеиться
+
+/* Проекция точки на отрезок: доля вдоль него и расстояние. */
+function projOnSeg(p, a, b){
+  const dx = b[0]-a[0], dy = b[1]-a[1], L = dx*dx + dy*dy;
+  let t = L ? ((p[0]-a[0])*dx + (p[1]-a[1])*dy)/L : 0;
+  t = Math.max(0, Math.min(1, t));
+  return {t, d: Math.hypot(p[0] - (a[0]+dx*t), p[1] - (a[1]+dy*t))};
+}
+/* Ближайшее место на ломаной. Мерить до вершин нельзя: после упрощения
+   прямой участок — это две точки, и правка в его середине не находится. */
+function nearestOnPolyline(p, px){
+  let best = {i:0, t:0, d:Infinity};
+  for (let i = 0; i < px.length - 1; i++){
+    const r = projOnSeg(p, px[i], px[i+1]);
+    if (r.d < best.d) best = {i, t:r.t, d:r.d};
+  }
+  return best;
+}
+const lerpLL = (a, b, t) => [a[0] + (b[0]-a[0])*t, a[1] + (b[1]-a[1])*t];
+
+/* Куда девать новый мазок. Раньше он тупо дописывался в конец, из-за чего
+   между несвязанными штрихами возникали прямые перемычки через пол-карты. */
+function applyStroke(strokePx){
+  const stroke = strokePx.map(([x,y]) => { const c = map.unproject([x,y]); return [c.lng, c.lat]; });
+  if (S.path.length < 2){ S.path = stroke; return 'начало'; }
+
+  const pathPx = S.path.map(c => { const p = map.project(c); return [p.x, p.y]; });
+  const head = pathPx[0], tail = pathPx[pathPx.length-1];
+  const s0 = strokePx[0], s1 = strokePx[strokePx.length-1];
+  const dist = (a, b) => Math.hypot(a[0]-b[0], a[1]-b[1]);
+
+  // 1. оба конца мазка легли на линию — это правка, заменяем участок между ними
+  const a = nearestOnPolyline(s0, pathPx), b = nearestOnPolyline(s1, pathPx);
+  if (a.d < SNAP_PX && b.d < SNAP_PX){
+    const [p1, p2, seg] = (a.i + a.t) <= (b.i + b.t)
+      ? [a, b, stroke] : [b, a, stroke.slice().reverse()];
+    const cut1 = lerpLL(S.path[p1.i], S.path[p1.i+1], p1.t);
+    const cut2 = lerpLL(S.path[p2.i], S.path[p2.i+1], p2.t);
+    S.path = S.path.slice(0, p1.i+1).concat([cut1], seg, [cut2], S.path.slice(p2.i+1));
+    return 'участок заменён';
+  }
+
+  // 2. иначе продлеваем от того конца маршрута, к которому мазок ближе
+  const opts = [
+    {d: dist(s0, tail), at:'tail', add: stroke},
+    {d: dist(s1, tail), at:'tail', add: stroke.slice().reverse()},
+    {d: dist(s0, head), at:'head', add: stroke.slice().reverse()},
+    {d: dist(s1, head), at:'head', add: stroke}
+  ].sort((x, y) => x.d - y.d)[0];
+
+  if (opts.d > SNAP_PX) return null;              // далеко от всего — не приклеиваем
+  S.path = opts.at === 'head' ? opts.add.concat(S.path) : S.path.concat(opts.add);
+  return 'продлено';
+}
+
 function endStroke(){
   if (!cur || cur.length < 2){ cur = null; return; }
-  const simp = simplifyPx(cur, 2.5).map(([x,y]) => { const c = map.unproject([x,y]); return [c.lng, c.lat]; });
-  S.strokes.push(simp);
+  const simp = simplifyPx(cur, 2.5);
+  const before = S.path.slice();
+  const what = applyStroke(simp);
   cur = null;
+  if (!what){
+    drawPreview();
+    flash('Мазок далеко от маршрута — начните у его конца или поверх линии');
+    return;
+  }
+  S.history.push(before);
+  if (S.history.length > 40) S.history.shift();
   recompute();
 }
+
+let flashTimer = null;
+function flash(msg){
+  hint.textContent = msg;
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => {
+    hint.textContent = S.draw ? 'Один палец рисует, два — двигают карту'
+                              : 'Тяните слайдер — время пересчитается';
+  }, 2600);
+}
 function drawPreview(){
-  const feats = S.strokes.map(s => ({type:'Feature',geometry:{type:'LineString',coordinates:s}}));
+  const feats = [];
+  if (S.path.length > 1) feats.push({type:'Feature',geometry:{type:'LineString',coordinates:S.path}});
   if (cur && cur.length > 1){
     feats.push({ type:'Feature', geometry:{ type:'LineString',
       coordinates: cur.map(([x,y]) => { const c = map.unproject([x,y]); return [c.lng,c.lat]; }) }});
   }
-  whenReady(() => map.getSource('route').setData({type:'FeatureCollection',features:feats}));
+  whenReady(() => {
+    map.getSource('route').setData({type:'FeatureCollection',features:feats});
+    // концы маршрута видно — сразу понятно, откуда его продолжать
+    const ends = S.path.length > 1 ? [S.path[0], S.path[S.path.length-1]] : [];
+    map.getSource('ends').setData({type:'FeatureCollection',
+      features: ends.map(c => ({type:'Feature',geometry:{type:'Point',coordinates:c}}))});
+  });
 }
 
 function localXY(e, t){
@@ -227,7 +312,7 @@ async function fetchElev(pts){
 
 // ---------- пересчёт ----------
 async function recompute(){
-  const path = S.strokes.flat();
+  const path = S.path;
   if (path.length < 2){ clearRoute(); return; }
   S.lastLen = path.reduce((sum, p, i, a) => i ? sum + haversine(a[i-1], p) : 0, 0);
   S.busy = true;
@@ -258,10 +343,11 @@ async function recompute(){
 }
 
 function clearRoute(){
-  Object.assign(S, {strokes:[], pts:[], ele:[], segs:[], dist:0, gain:0, loss:0});
+  Object.assign(S, {path:[], history:[], pts:[], ele:[], segs:[], dist:0, gain:0, loss:0});
   map.getSource('route')?.setData({type:'FeatureCollection',features:[]});
   map.getSource('segs')?.setData({type:'FeatureCollection',features:[]});
   map.getSource('cur')?.setData({type:'FeatureCollection',features:[]});
+  map.getSource('ends')?.setData({type:'FeatureCollection',features:[]});
   pill.classList.remove('on');
   bUndo.classList.remove('on'); bClear.classList.remove('on');
   hint.textContent = 'Нажмите карандаш и обведите маршрут пальцем';
@@ -375,7 +461,12 @@ document.getElementById('bDraw').onclick = function(){
     ? 'Один палец рисует, два — двигают карту'
     : (S.segs.length ? 'Тяните слайдер — время пересчитается' : 'Нажмите карандаш и обведите маршрут пальцем');
 };
-bUndo.onclick = () => { S.strokes.pop(); drawPreview(); S.strokes.length ? recompute() : clearRoute(); };
+bUndo.onclick = () => {
+  if (!S.history.length) return clearRoute();
+  S.path = S.history.pop();
+  drawPreview();
+  S.path.length > 1 ? recompute() : clearRoute();
+};
 bClear.onclick = () => clearRoute();
 
 /* Слои переключаем только по готовому стилю: иначе setLayoutProperty бросает
