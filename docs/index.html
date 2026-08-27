@@ -69,21 +69,26 @@ html,body{margin:0;height:100%;overflow:hidden;
 #bClear.on{display:grid}
 .btn.tucked{display:none !important}
 
-#layers,#routes{position:absolute;right:12px;top:calc(var(--safe-top) + 64px);z-index:7;
+#layers,#routes,#settings{position:absolute;right:12px;top:calc(var(--safe-top) + 64px);z-index:7;
   background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:6px;display:none;width:200px}
-#layers.on,#routes.on{display:block}
+#layers.on,#routes.on,#settings.on{display:block}
 #routes{left:12px;right:auto;width:254px;max-height:52vh;overflow-y:auto}
-#layers .row,#routes .row{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;
+#settings{left:12px;right:auto;top:calc(var(--safe-top) + 116px);width:232px}
+#settings .srow{display:flex;justify-content:space-between;align-items:center;
+  padding:7px 11px;font-size:14px}
+#settings input{width:62px;padding:7px;border:1px solid var(--line);border-radius:9px;
+  text-align:center;font-size:15px;font-variant-numeric:tabular-nums}
+#layers .row,#routes .row,#settings .row{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;
   display:flex;justify-content:space-between;align-items:center;gap:8px}
-#layers .row:hover,#routes .row:hover{background:#f4f6f7}
+#layers .row:hover,#routes .row:hover,#settings .row:hover{background:#f4f6f7}
 #layers .row.sel{background:#eef4f0;color:var(--accent);font-weight:600}
 #layers .row.sel::after{content:'✓';font-weight:700}
 #layers .row.dis{opacity:.45}
-#layers .sep,#routes .sep{height:1px;background:var(--line);margin:5px 8px}
+#layers .sep,#routes .sep,#settings .sep{height:1px;background:var(--line);margin:5px 8px}
 #routes .saveRow{color:var(--accent);font-weight:600}
 #routes .meta{font-size:11px;color:var(--muted)}
 #routes .rx{color:var(--muted);padding:2px 7px;font-size:15px;flex:0 0 auto}
-#layers .cap,#routes .cap{font-size:11px;color:var(--muted);padding:5px 11px 2px;
+#layers .cap,#routes .cap,#settings .cap{font-size:11px;color:var(--muted);padding:5px 11px 2px;
   text-transform:uppercase;letter-spacing:.05em}
 
 /* ---- шторка: три положения, потолок 56% экрана ---- */
@@ -118,8 +123,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 
 #statusLine{font-size:12.5px;min-height:17px;margin:0 0 10px;color:var(--muted)}
 
-#restSummary{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 8px;
-  min-height:17px;font-variant-numeric:tabular-nums}
+#restSummary{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;
+  margin:0 0 10px;min-height:26px}
+.chip{background:#f2f4f6;border-radius:9px;padding:5px 10px;font-size:12px;
+  color:var(--muted);white-space:nowrap}
+.chip b{color:var(--fg);font-weight:650;font-variant-numeric:tabular-nums}
 .selrow{display:flex;gap:8px;margin:0 0 8px}
 .selrow label{flex:1;font-size:11.5px;color:var(--muted);display:flex;
   flex-direction:column;gap:4px}
@@ -130,13 +138,13 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 
 #analysis{border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
 #prof{width:100%;height:104px;display:block;touch-action:none}
-#profTxt{font-size:12px;color:var(--muted);text-align:center;min-height:16px;margin-top:2px}
-#stats{display:flex;gap:5px 0;margin:10px 0 2px}
-#stats div{flex:1;text-align:center}
-#stats .k{font-size:11px;color:var(--muted)}
-#stats .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
-#restLine{font-size:12.5px;color:var(--muted);text-align:center;margin:8px 0 2px;
-  font-variant-numeric:tabular-nums}
+#profHead{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 4px}
+#profHead .t{font-size:12px;color:var(--muted)}
+#profVal{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;min-height:16px}
+#stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 2px}
+#stats .tile{background:#f2f4f6;border-radius:12px;padding:10px 12px;text-align:center}
+#stats .k{font-size:11px;color:var(--muted);margin-bottom:2px}
+#stats .v{font-size:17px;font-weight:650;font-variant-numeric:tabular-nums}
 
 /* ---- онбординг ---- */
 #ob{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;
@@ -182,7 +190,15 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 
 <button class="btn" id="bLayers" title="Слои">◈</button>
 <button class="btn" id="bRoutes" title="Мои маршруты" style="left:12px;top:calc(var(--safe-top) + 12px);right:auto">☰</button>
+<button class="btn" id="bSettings" title="Настройки" style="left:12px;top:calc(var(--safe-top) + 64px);right:auto">⚙</button>
 <div id="routes"></div>
+<div id="settings">
+  <div class="cap">Настройки</div>
+  <div class="srow"><span>Вес тела</span>
+    <span><input type="number" id="setBody" min="35" max="160"> кг</span></div>
+  <div class="sep"></div>
+  <div class="row" id="setOb">Показать обучение</div>
+</div>
 <button class="btn" id="bDraw" title="Рисовать маршрут">✎</button>
 <button class="btn" id="bUndo" title="Отменить">↶</button>
 <button class="btn" id="bClear" title="Стереть маршрут">✕</button>
@@ -227,14 +243,14 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
       </div>
     </div>
     <div id="analysis">
+      <div id="profHead"><span class="t">Профиль высот</span><span id="profVal"></span></div>
       <svg id="prof" viewBox="0 0 340 104" preserveAspectRatio="none"></svg>
-      <div id="profTxt">Коснитесь графика — точка подсветится на карте</div>
       <div id="stats">
-        <div><div class="k">набор</div><div class="v" id="sGain">—</div></div>
-        <div><div class="k">сброс</div><div class="v" id="sLoss">—</div></div>
-        <div><div class="k">средний темп</div><div class="v" id="sPaceAvg">—</div></div>
+        <div class="tile"><div class="k">набор</div><div class="v" id="sGain">—</div></div>
+        <div class="tile"><div class="k">сброс</div><div class="v" id="sLoss">—</div></div>
+        <div class="tile"><div class="k">средний темп</div><div class="v" id="sPaceAvg">—</div></div>
+        <div class="tile"><div class="k">по плоской карте</div><div class="v" id="sNaive">—</div></div>
       </div>
-      <div id="restLine"></div>
     </div>
   </div>
 </div>

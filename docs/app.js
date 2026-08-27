@@ -384,8 +384,9 @@ function clearRoute(){
   });
   pill.classList.remove('on');
   bUndo.classList.remove('on'); bClear.classList.remove('on');
-  ['sGain','sLoss','sPaceAvg'].forEach(id => document.getElementById(id).textContent = '—');
-  ['restSummary','restLine'].forEach(id => document.getElementById(id).textContent = '');
+  ['sGain','sLoss','sPaceAvg','sNaive'].forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('restSummary').innerHTML = '';
+  document.getElementById('profVal').textContent = '';
   document.getElementById('prof').innerHTML = '';
   sheetTo('hidden');
   updateEmptyHint();
@@ -472,12 +473,12 @@ function render(){
   sGain.textContent = Math.round(S.gain) + ' м';
   sLoss.textContent = Math.round(S.loss) + ' м';
   sPaceAvg.textContent = t > 0 ? (S.dist/1000/t).toFixed(1) + ' км/ч' : '—';
-  document.getElementById('restSummary').textContent =
-    `в движении ${fmtH(t)}` +
-    (br.n10 ? ` · привалы ${br.n10} × 10 мин` : ' · без привалов') +
-    (br.lunch ? ` · обед ${br.lunch} мин` : '');
-  document.getElementById('restLine').textContent =
-    `без учёта рельефа и веса вышло бы ${fmtH(n)}`;
+  const chip = (k, v) => `<span class="chip">${k} <b>${v}</b></span>`;
+  document.getElementById('restSummary').innerHTML =
+    chip('в движении', fmtH(t)) +
+    (br.n10 ? chip('привалы', `${br.n10} × 10 мин`) : '') +
+    (br.lunch ? chip('обед', `${br.lunch} мин`) : '');
+  document.getElementById('sNaive').textContent = fmtH(n);
 
   const t1 = timeHours(segs, body, load+1, power, S.terrain);
   S.sens = Math.round((t1-t)*60);
@@ -529,7 +530,7 @@ function profTouch(clientX){
   whenReady(() => map.getSource('cur').setData({type:'Feature',
     geometry:{type:'Point',coordinates:S.pts[i]}}));
   const km = (i/(S.ele.length-1)*S.dist/1000).toFixed(1);
-  document.getElementById('profTxt').textContent = `${km} км · ${Math.round(S.ele[i])} м`;
+  document.getElementById('profVal').textContent = `${km} км · ${Math.round(S.ele[i])} м`;
 }
 profEl.addEventListener('touchmove', e => { e.preventDefault(); profTouch(e.touches[0].clientX); }, {passive:false});
 profEl.addEventListener('touchstart', e => { e.preventDefault(); profTouch(e.touches[0].clientX); }, {passive:false});
@@ -574,7 +575,7 @@ function sheetTo(pos){
   SHEET.pos = pos;
   const p = sheetPositions();
   sheet.style.transform = `translateY(${p[pos]}px)`;
-  if (pos !== 'hidden'){ closeLayers(); closeRoutes(); }
+  if (pos !== 'hidden'){ closeLayers(); closeRoutes(); closeSettings(); }
   // кнопки рисования уезжают выше шторки, а в полной позиции прячутся
   const visible = pos === 'hidden' ? 0 : p.h - p[pos];
   [bDraw, bUndo, bClear].forEach(b => b.classList.toggle('tucked', pos === 'full'));
@@ -624,7 +625,7 @@ function closeLayers(){
 }
 document.getElementById('bLayers').onclick = () => {
   if (layersEl.classList.contains('on')) return closeLayers();
-  closeRoutes();
+  closeRoutes(); closeSettings();
   layersEl.classList.add('on');
   updatePillVis();   // панель и плашка не должны перекрываться
 };
@@ -828,11 +829,35 @@ function tryOpenShared(){
 function closeRoutes(){ routesEl.classList.remove('on'); updatePillVis(); }
 function updatePillVis(){
   pill.style.visibility =
-    (layersEl.classList.contains('on') || routesEl.classList.contains('on')) ? 'hidden' : '';
+    (layersEl.classList.contains('on') || routesEl.classList.contains('on') ||
+     settingsEl.classList.contains('on')) ? 'hidden' : '';
 }
+
+// ---------- настройки ----------
+const settingsEl = document.getElementById('settings');
+const setBody = document.getElementById('setBody');
+function closeSettings(){ settingsEl.classList.remove('on'); updatePillVis(); }
+document.getElementById('bSettings').onclick = () => {
+  if (settingsEl.classList.contains('on')) return closeSettings();
+  closeLayers(); closeRoutes();
+  setBody.value = S.body;
+  settingsEl.classList.add('on');
+  updatePillVis();
+};
+setBody.onchange = () => {
+  const v = Math.round(+setBody.value);
+  if (!(v >= 35 && v <= 160)){ setBody.value = S.body; return; }
+  S.body = v; localStorage.setItem('body', v); setBody.value = v;
+  paintTicks();
+  if (S.segs.length) render(); else updateWeightUI();
+};
+document.getElementById('setOb').onclick = () => {
+  closeSettings();
+  obStep = 0; ob.classList.add('on'); obRender();
+};
 document.getElementById('bRoutes').onclick = () => {
   if (routesEl.classList.contains('on')) return closeRoutes();
-  closeLayers();
+  closeLayers(); closeSettings();
   renderRoutes();
   routesEl.classList.add('on');
   updatePillVis();
