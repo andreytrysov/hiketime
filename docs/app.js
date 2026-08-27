@@ -109,6 +109,11 @@ const map = new maplibregl.Map({
   }
 });
 map.addControl(new maplibregl.NavigationControl({showCompass:false}), 'bottom-left');
+map.addControl(new maplibregl.GeolocateControl({
+  positionOptions: {enableHighAccuracy: true},
+  trackUserLocation: true,
+  showUserHeading: true
+}), 'bottom-left');
 map.on('error', e => console.error('MAPERR', e && e.error && e.error.message));
 
 let layersReady = false;
