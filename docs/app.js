@@ -118,6 +118,14 @@ const map = new maplibregl.Map({
   }
 });
 map.addControl(new maplibregl.NavigationControl({showCompass:false}), 'bottom-left');
+// Safari меняет высоту вьюпорта, сворачивая панели — карту надо пересчитывать,
+// иначе она остаётся размером с вьюпорт момента загрузки (белые поля).
+const fixMapSize = () => map.resize();
+window.visualViewport && window.visualViewport.addEventListener('resize', fixMapSize);
+window.addEventListener('orientationchange', () => setTimeout(fixMapSize, 300));
+setTimeout(fixMapSize, 400);
+setTimeout(fixMapSize, 1500);
+
 map.addControl(new maplibregl.GeolocateControl({
   positionOptions: {enableHighAccuracy: true},
   trackUserLocation: true,
