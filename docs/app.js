@@ -465,7 +465,6 @@ function render(){
 
   pill.classList.add('on');
   pTime.textContent = fmtH(br.total);
-  pNaive.textContent = fmtH(n);
   pSub.textContent = `${(S.dist/1000).toFixed(1)} км · ↑${Math.round(S.gain)} м · ↓${Math.round(S.loss)} м`;
   bUndo.classList.add('on'); bClear.classList.add('on');
 
@@ -475,7 +474,8 @@ function render(){
   document.getElementById('restLine').textContent =
     `в движении ${fmtH(t)}` +
     (br.n10 ? ` · привалы ${br.n10} × 10 мин` : ' · без привалов') +
-    (br.lunch ? ` · обед ${br.lunch} мин` : '');
+    (br.lunch ? ` · обед ${br.lunch} мин` : '') +
+    ` · без рельефа вышло бы ${fmtH(n)}`;
 
   const t1 = timeHours(segs, body, load+1, power, S.terrain);
   S.sens = Math.round((t1-t)*60);
@@ -535,7 +535,7 @@ profEl.addEventListener('mousemove', e => profTouch(e.clientX));
 
 // ---------- элементы ----------
 const pill = document.getElementById('pill');
-const pTime = document.getElementById('pTime'), pNaive = document.getElementById('pNaive');
+const pTime = document.getElementById('pTime');
 const pSub = document.getElementById('pSub');
 const bUndo = document.getElementById('bUndo'), bClear = document.getElementById('bClear');
 const bDraw = document.getElementById('bDraw');
