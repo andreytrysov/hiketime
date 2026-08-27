@@ -25,7 +25,8 @@ def main():
             print(f"-- {name}: уже есть")
             continue
         try:
-            path = router.route(start, end)
+            path = (router.route_via(start + [end]) if isinstance(start, list)
+                    else router.route(start, end))
         except Exception as e:
             print(f"!! {name}: overpass не ответил ({e})")
             continue

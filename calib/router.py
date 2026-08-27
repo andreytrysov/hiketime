@@ -48,6 +48,19 @@ def haversine(a, b):
     return 2*6371008.8*math.asin(math.sqrt(h))
 
 
+def route_via(points, pad=0.02):
+    """Маршрут через цепочку точек: Дейкстра по каждой паре, склейка.
+    Нужен там, где кратчайший путь не совпадает с именованным маршрутом
+    (Бессегген: кратчайший — по берегу, норматив — по гребню)."""
+    out = []
+    for a, b in zip(points, points[1:]):
+        leg = route(a, b, pad=pad)
+        if not leg:
+            return None
+        out.extend(leg if not out else leg[1:])
+    return out
+
+
 def route(start, end, pad=0.02):
     """(lat,lon) -> (lat,lon): список (lat,lon) вдоль троп или None."""
     s, n = min(start[0], end[0])-pad, max(start[0], end[0])+pad
@@ -71,8 +84,27 @@ def route(start, end, pad=0.02):
     if not adj:
         return None
 
+    # привязываемся только к крупнейшей компоненте: ближайший узел может
+    # оказаться изолированным огрызком тропы в два узла
+    seen_all = set()
+    biggest = set()
+    for n0 in adj:
+        if n0 in seen_all:
+            continue
+        comp = {n0}
+        stack = [n0]
+        while stack:
+            u = stack.pop()
+            for v, _ in adj[u]:
+                if v not in comp:
+                    comp.add(v)
+                    stack.append(v)
+        seen_all |= comp
+        if len(comp) > len(biggest):
+            biggest = comp
+
     def nearest(pt):
-        return min(adj, key=lambda i: haversine(nodes[i], pt))
+        return min(biggest, key=lambda i: haversine(nodes[i], pt))
 
     src, dst = nearest(start), nearest(end)
     dist = {src: 0.0}
