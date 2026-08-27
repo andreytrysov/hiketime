@@ -32,6 +32,8 @@ html,body{margin:0;height:100vh;height:100dvh;overflow:hidden;
   text-align:center;min-width:150px;max-width:calc(100vw - 110px);
   display:none;cursor:pointer}
 #pill.on{display:block}
+#pill .nm{font-size:11.5px;color:var(--muted);margin-bottom:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
 #pill .t{font-size:30px;font-weight:650;letter-spacing:-.02em;line-height:1.05;
   font-variant-numeric:tabular-nums}
 #pill .sub{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;
@@ -64,6 +66,7 @@ html,body{margin:0;height:100vh;height:100dvh;overflow:hidden;
 #bDraw svg{width:24px;height:24px}
 .btn:active{transform:scale(.94)}
 .btn.on{background:var(--accent);color:#fff}
+.btn.done{background:var(--accent);color:#fff}
 #bLayers{right:12px;top:calc(var(--safe-top) + 12px)}
 #bDraw{right:12px;bottom:calc(var(--safe-bot) + 44px);width:56px;height:56px;
   border-radius:16px;font-size:23px}
@@ -82,8 +85,8 @@ html,body{margin:0;height:100vh;height:100dvh;overflow:hidden;
 #settings{left:12px;right:auto;top:calc(var(--safe-top) + 116px);width:232px}
 #settings .srow{display:flex;justify-content:space-between;align-items:center;
   padding:7px 11px;font-size:14px}
-#settings input{width:62px;padding:7px;border:1px solid var(--line);border-radius:9px;
-  text-align:center;font-size:15px;font-variant-numeric:tabular-nums}
+#settings select{width:76px;padding:7px;border:1px solid var(--line);border-radius:9px;
+  text-align:center;font-size:15px;font-variant-numeric:tabular-nums;background:#fff;color:var(--fg)}
 #layers .row,#routes .row,#settings .row{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;
   display:flex;justify-content:space-between;align-items:center;gap:8px}
 #layers .row:hover,#routes .row:hover,#settings .row:hover{background:#f4f6f7}
@@ -198,6 +201,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 <div id="map"></div>
 
 <div id="pill">
+  <div class="nm" id="pName" style="display:none"></div>
   <div class="t" id="pTime">—</div>
   <div class="sub" id="pSub"></div>
 </div>
@@ -210,7 +214,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 <div id="settings">
   <div class="cap">Настройки</div>
   <div class="srow"><span>Вес тела</span>
-    <span><input type="number" id="setBody" min="35" max="160"> кг</span></div>
+    <span><select id="setBody"></select> кг</span></div>
   <div class="sep"></div>
   <div class="row" id="setOb">Как это работает</div>
 </div>
@@ -280,5 +284,5 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 </div>
 
 <script src="vendor/maplibre-gl.js"></script>
-<script src="app.js?v=15"></script>
+<script src="app.js?v=16"></script>
 </body></html>

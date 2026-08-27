@@ -86,6 +86,7 @@ function gainLoss(ele, thr=2){
 const S = {
   path: [], history: [], pts: [], ele: [], segs: [],
   dist: 0, gain: 0, loss: 0, sens: 0,
+  routeName: null, savedId: null,
   body: +(localStorage.getItem('body') || 75),
   load: +(localStorage.getItem('load') || 10),
   power: 3.6, terrain: +(localStorage.getItem('terrain') || 1),
@@ -276,6 +277,7 @@ function endStroke(){
   }
   S.history.push(before);
   if (S.history.length > 40) S.history.shift();
+  S.savedId = null;              // маршрут изменился — состояние «сохранено» снято
   recompute();
 }
 
@@ -385,7 +387,9 @@ async function recompute(){
 }
 
 function clearRoute(){
-  Object.assign(S, {path:[], history:[], pts:[], ele:[], segs:[], dist:0, gain:0, loss:0});
+  Object.assign(S, {path:[], history:[], pts:[], ele:[], segs:[], dist:0, gain:0, loss:0,
+    routeName:null, savedId:null});
+  pName.style.display = 'none';
   whenReady(() => {
     ['route','spd','cur','ends'].forEach(id =>
       map.getSource(id)?.setData({type:'FeatureCollection',features:[]}));
@@ -477,6 +481,10 @@ function render(){
   pTime.textContent = fmtH(br.total);
   pSub.textContent = `${(S.dist/1000).toFixed(1)} км · ↑${Math.round(S.gain)} м · ↓${Math.round(S.loss)} м`;
   bUndo.classList.add('on'); bClear.classList.add('on'); bSave.classList.add('on');
+  bSave.classList.toggle('done', !!S.savedId);
+  bSave.title = S.savedId ? 'Сохранено' : 'Сохранить маршрут';
+  pName.textContent = S.routeName || '';
+  pName.style.display = S.routeName ? '' : 'none';
 
   sGain.textContent = Math.round(S.gain) + ' м';
   sLoss.textContent = Math.round(S.loss) + ' м';
@@ -547,6 +555,7 @@ profEl.addEventListener('mousemove', e => profTouch(e.clientX));
 // ---------- элементы ----------
 const pill = document.getElementById('pill');
 const pTime = document.getElementById('pTime');
+const pName = document.getElementById('pName');
 const pSub = document.getElementById('pSub');
 const bUndo = document.getElementById('bUndo'), bClear = document.getElementById('bClear');
 const bSave = document.getElementById('bSave');
@@ -667,6 +676,7 @@ bDraw.onclick = function(){
 };
 bUndo.onclick = () => {
   if (!S.history.length) return clearRoute();
+  S.savedId = null;
   S.path = S.history.pop();
   drawPreview();
   S.path.length > 1 ? recompute() : clearRoute();
@@ -705,24 +715,33 @@ function loadRoutes(){
 }
 function persistRoutes(r){ localStorage.setItem('routes', JSON.stringify(r)); }
 
+const escHtml = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
 function saveCurrent(){
   if (S.path.length < 2) return;
+  if (S.savedId){ toast('Маршрут уже сохранён'); return; }
+  const auto = `Маршрут ${(S.dist/1000).toFixed(1)} км`;
+  let name = prompt('Название маршрута:', S.routeName || auto);
+  if (name === null) return;
+  name = name.trim() || auto;
+  const id = Date.now();
   const r = loadRoutes();
   r.unshift({
-    id: Date.now(),
-    name: `Маршрут ${(S.dist/1000).toFixed(1)} км`,
-    ts: Date.now(),
+    id, name, ts: id,
     path: S.path, load: S.load, terrain: S.terrain, power: S.power,
     dist: S.dist, time: pTime.textContent
   });
   if (r.length > 30) r.pop();          // прототип, не база данных
   persistRoutes(r);
+  S.savedId = id; S.routeName = name;
+  render();
   renderRoutes();
-  toast('Маршрут сохранён на этом устройстве');
+  toast('Сохранено');
 }
 
 function openRoute(o){
   S.path = o.path.slice(); S.history = [];
+  S.routeName = o.name; S.savedId = o.id;
   S.load = o.load; wSlider.value = o.load; localStorage.setItem('load', o.load);
   S.terrain = o.terrain || 1; surfSel.value = String(S.terrain);
   S.power = o.power || 3.6; paceSel.value = String(S.power);
@@ -740,7 +759,7 @@ function renderRoutes(){
     : '';
   html += '<div class="cap">Мои маршруты</div>';
   html += list.length ? list.map(o =>
-      `<div class="row" data-id="${o.id}"><span><span>${o.name}</span><br>` +
+      `<div class="row" data-id="${o.id}"><span><span>${escHtml(o.name)}</span><br>` +
       `<span class="meta">${(o.dist/1000).toFixed(1)} км · ${o.time} · ` +
       `${new Date(o.ts).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</span></span>` +
       `<span class="rx" data-del="${o.id}">✕</span></div>`).join('')
@@ -834,6 +853,11 @@ function updatePillVis(){
 // ---------- настройки ----------
 const settingsEl = document.getElementById('settings');
 const setBody = document.getElementById('setBody');
+for (let kg = 35; kg <= 160; kg++){
+  const o = document.createElement('option');
+  o.value = kg; o.textContent = kg;
+  setBody.appendChild(o);
+}
 function closeSettings(){ settingsEl.classList.remove('on'); updatePillVis(); }
 document.getElementById('bSettings').onclick = () => {
   if (settingsEl.classList.contains('on')) return closeSettings();
