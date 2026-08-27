@@ -42,7 +42,8 @@ html,body{margin:0;height:100%;overflow:hidden;
   top:calc(var(--safe-top) + 14px);z-index:5;
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
   border-radius:14px;box-shadow:var(--shadow);padding:10px 16px;
-  font-size:13.5px;color:var(--muted);display:none;white-space:nowrap}
+  font-size:13.5px;color:var(--muted);display:none;text-align:center;
+  max-width:calc(100vw - 132px)}
 #emptyHint.on{display:block}
 
 /* ---- всплывающее сообщение ---- */
@@ -177,6 +178,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;
 /* на тачах зум — щипком и двойным тапом, кнопки только занимают место */
 @media (pointer:coarse){
   .maplibregl-ctrl-zoom-in,.maplibregl-ctrl-zoom-out{display:none}
+  .maplibregl-ctrl-group:has(.maplibregl-ctrl-zoom-in){display:none}
 }
 </style></head>
 <body>
