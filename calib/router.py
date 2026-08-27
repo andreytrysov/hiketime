@@ -20,16 +20,18 @@ def _fetch(query):
         return json.load(open(key))
     ctx = ssl.create_default_context(cafile=certifi.where())
     data = urllib.parse.urlencode({"data": query}).encode()
-    for attempt in range(3):
+    req = urllib.request.Request(API, data=data, headers={
+        "User-Agent": "hiketime-calibration/0.1 (andreytrysov@gmail.com)"})
+    for attempt in range(5):
         try:
-            with urllib.request.urlopen(API, data=data, timeout=180, context=ctx) as r:
+            with urllib.request.urlopen(req, timeout=180, context=ctx) as r:
                 out = json.load(r)
             json.dump(out, open(key, "w"))
             return out
         except Exception:
-            if attempt == 2:
+            if attempt == 4:
                 raise
-            time.sleep(20)
+            time.sleep(25)
 
 
 def haversine(a, b):

@@ -120,6 +120,10 @@
       "inputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/DEM.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift"
         },
         {
@@ -139,6 +143,7 @@
       "moduleName" : "HikeTimeCore",
       "moduleOutputPath" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.swiftmodule",
       "objects" : [
+        "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM.swift.o",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/TimeModel.swift.o"
       ],
@@ -180,6 +185,10 @@
       "outputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o"
         },
         {
@@ -192,6 +201,7 @@
         }
       ],
       "sources" : [
+        "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/DEM.swift",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift",
         "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift"
       ],
@@ -347,6 +357,7 @@
       "hiketimecore",
       "-incremental",
       "-c",
+      "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/DEM.swift",
       "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift",
       "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift",
       "-I",
@@ -486,6 +497,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o"
         },
         {
@@ -508,6 +523,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/DEM.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift"
         },
         {
@@ -523,6 +542,10 @@
         {
           "kind" : "virtual",
           "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM.swift.o"
         },
         {
           "kind" : "file",

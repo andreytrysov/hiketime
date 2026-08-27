@@ -2,6 +2,12 @@
   "": {
     "swift-dependencies": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/master.swiftdeps"
   },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/DEM.swift": {
+    "dependencies": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM.d",
+    "object": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM.swift.o",
+    "swiftmodule": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM~partial.swiftmodule",
+    "swift-dependencies": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/DEM.swiftdeps"
+  },
   "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift": {
     "dependencies": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.d",
     "object": "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/.build/arm64-apple-macosx/debug/HikeTimeCore.build/Geo.swift.o",

@@ -71,5 +71,31 @@ var sum = 0.0
 for i in 1..<dense.count { sum += Geo.haversine(dense[i-1], dense[i]) }
 check(near(sum, Geo.haversine(pts[0], pts[1]), rel: 1e-6), "ресемплинг держит длину")
 
+print("DEM (реальный тайл z12 из фикстуры):")
+struct DemFix: Codable {
+    struct Case: Codable { let lat, lon, elev: Double }
+    let zoom, tx, ty: Int
+    let cases: [Case]
+}
+let demURL = root.appendingPathComponent("Tests/HikeTimeCoreTests/Fixtures/dem_reference.json")
+let demFix = try! JSONDecoder().decode(DemFix.self, from: Data(contentsOf: demURL))
+let tileURL = root.appendingPathComponent(
+    "Tests/HikeTimeCoreTests/Fixtures/tile_\(demFix.zoom)_\(demFix.tx)_\(demFix.ty).png")
+let tile = DEM.Tile(pngData: try! Data(contentsOf: tileURL))!
+var demOK = true
+for c in demFix.cases {
+    let e = try! DEM.elevation(lat: c.lat, lon: c.lon, zoom: demFix.zoom) { key in
+        guard key.x == demFix.tx, key.y == demFix.ty else {
+            throw DEM.DEMError.tileUnavailable(key)
+        }
+        return tile
+    }
+    if abs(e - c.elev) > 0.05 {
+        demOK = false
+        print("  расходится: \(c.lat),\(c.lon): \(e) vs \(c.elev)")
+    }
+}
+check(demOK, "5 высот совпадают с Python в пределах 5 см")
+
 print(failed == 0 ? "\nВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "\nПРОВАЛЕНО: \(failed)")
 exit(failed == 0 ? 0 : 1)
