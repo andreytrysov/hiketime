@@ -613,7 +613,7 @@ document.querySelectorAll('#layers .row').forEach(row => row.onclick = () => {
   if (row.dataset.base){
     S.base = row.dataset.base;
   } else if (row.dataset.ov === 'contours'){
-    if (S.base === 'topo'){ toast('На топокарте горизонтали уже есть'); return; }
+    if (S.base === 'topo'){ toast('На топокарте линии высот уже есть'); return; }
     S.contours = !S.contours;
   } else {
     S.speedColor = !S.speedColor;
