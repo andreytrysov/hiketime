@@ -33,9 +33,11 @@ struct SheetView: View {
         }
         .frame(maxWidth: .infinity)
         .background {
+            // сплошной фон, как в прототипе: на материале плитки растворялись
             UnevenRoundedRectangle(topLeadingRadius: 18,
                                    topTrailingRadius: 18)
-                .fill(.regularMaterial)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.10), radius: 10, y: -3)
                 .ignoresSafeArea(edges: .bottom)
         }
         .offset(y: dragOffset)
