@@ -25,7 +25,12 @@ final class AppModel: ObservableObject {
     @Published var savedId: Double?
 
     // карта
-    @AppStorage("baseLayer") var baseLayer: String = "hillshade"
+    @AppStorage("baseLayer") var baseLayer: String = "hillshade" {
+        willSet { objectWillChange.send() }
+    }
+    @AppStorage("contours") var contours = false {
+        willSet { objectWillChange.send() }
+    }
     @Published var speedColor = false
     @Published var followUser = false
     /// счётчик запросов «подлететь к маршруту»

@@ -45,6 +45,7 @@ struct MapView: UIViewRepresentable {
         }
         context.coordinator.syncRoute()
         context.coordinator.syncSpeedColor()
+        context.coordinator.syncContours()
         context.coordinator.syncHighlight()
     }
 
@@ -54,6 +55,23 @@ struct MapView: UIViewRepresentable {
     private static func styleURL(base: String) -> URL {
         let res = Bundle.main.resourceURL!
             .appendingPathComponent("Tiles/terrarium").path
+        let contours = Bundle.main.resourceURL!
+            .appendingPathComponent("Tiles/contours.geojson").path
+        // слои горизонталей — из вшитого GeoJSON, посчитанного из тех же
+        // terrarium-тайлов при сборке пакета (шаг 100 м, жирные каждые 500)
+        let contourSource = """
+        ,"contours":{"type":"geojson","data":"file://\(contours)"}
+        """
+        let contourLayers = """
+        ,{"id":"contour-minor","type":"line","source":"contours",
+          "filter":["==",["get","major"],0],
+          "layout":{"visibility":"none"},
+          "paint":{"line-color":"#a08050","line-opacity":0.45,"line-width":0.8}},
+        {"id":"contour-major","type":"line","source":"contours",
+          "filter":["==",["get","major"],1],
+          "layout":{"visibility":"none"},
+          "paint":{"line-color":"#8a6d3b","line-opacity":0.65,"line-width":1.4}}
+        """
         let json: String
         if base == "topo" {
             json = """
@@ -73,20 +91,20 @@ struct MapView: UIViewRepresentable {
             json = """
             {"version":8,"sources":{"sat":{"type":"raster","tileSize":256,
             "maxzoom":18,"attribution":"Esri",
-            "tiles":["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"]}},
-            "layers":[{"id":"sat","type":"raster","source":"sat"}]}
+            "tiles":["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"]}\(contourSource)},
+            "layers":[{"id":"sat","type":"raster","source":"sat"}\(contourLayers)]}
             """
         } else {
             json = """
             {"version":8,"sources":{"dem":{"type":"raster-dem","encoding":"terrarium",
             "tileSize":256,"maxzoom":12,
-            "tiles":["file://\(res)/{z}/{x}/{y}.png"]}},
+            "tiles":["file://\(res)/{z}/{x}/{y}.png"]}\(contourSource)},
             "layers":[
               {"id":"bg","type":"background","paint":{"background-color":"#eef1ec"}},
               {"id":"hills","type":"hillshade","source":"dem",
                "paint":{"hillshade-exaggeration":0.6,
                         "hillshade-shadow-color":"#5a5a4d",
-                        "hillshade-highlight-color":"#ffffff"}}]}
+                        "hillshade-highlight-color":"#ffffff"}}\(contourLayers)]}
             """
         }
         let url = FileManager.default.temporaryDirectory
@@ -238,6 +256,13 @@ struct MapView: UIViewRepresentable {
                 edgePadding: UIEdgeInsets(top: 120, left: 50,
                                           bottom: 280, right: 50),
                 animated: true, completionHandler: nil)
+        }
+
+        func syncContours() {
+            guard styleReady, let map else { return }
+            for id in ["contour-minor", "contour-major"] {
+                map.style?.layer(withIdentifier: id)?.isVisible = model.contours
+            }
         }
 
         func syncHighlight() {

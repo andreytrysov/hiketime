@@ -286,11 +286,18 @@ struct ContentView: View {
             Text(loc.t("Поверх").uppercased())
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-            Text(loc.t("Линии высот"))
-                .font(.subheadline)
-                .foregroundStyle(.secondary.opacity(0.6))
-                .padding(.vertical, 7)
-                .padding(.horizontal, 10)
+            if model.baseLayer == "hillshade" || model.baseLayer == "satellite" {
+                layerRow(loc.t("Линии высот"),
+                         selected: model.contours) {
+                    model.contours.toggle()
+                }
+            } else {
+                Text(loc.t("Линии высот"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary.opacity(0.6))
+                    .padding(.vertical, 7)
+                    .padding(.horizontal, 10)
+            }
             Divider()
             Text(loc.t("Маршрут").uppercased())
                 .font(.caption2)
