@@ -123,7 +123,7 @@ struct ContentView: View {
     }
 
     private var rightColumn: some View {
-        VStack(spacing: 10) {
+        VStack(alignment: .trailing, spacing: 10) {
             Spacer()
             if model.hasRoute {
                 MapButton(icon: model.savedId != nil ? "checkmark" : "floppy",
@@ -177,7 +177,7 @@ struct ContentView: View {
                                                terrain: model.terrain,
                                                power: model.power)) {
                     PanelRow(icon: "square.and.arrow.up",
-                             text: loc.t("Поделиться ссылкой"),
+                             text: loc.t("Поделиться текущим маршрутом"),
                              tint: Theme.accent)
                 }
                 Divider()
@@ -262,6 +262,7 @@ struct ContentView: View {
                 PanelRow(icon: "questionmark.circle",
                          text: loc.t("Как это работает"), tint: .primary)
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -278,9 +279,18 @@ struct ContentView: View {
             Text(loc.t("Слои").uppercased())
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-            layerRow("mountain.2", loc.t("Отмывка рельефа"),
+            layerRow("mountain.2", loc.t("Рельеф (оффлайн)"),
                      selected: model.baseLayer == "hillshade") {
                 model.baseLayer = "hillshade"
+            }
+            layerRow("point.topleft.down.curvedto.point.bottomright.up",
+                     loc.t("Топо (онлайн)"),
+                     selected: model.baseLayer == "topo") {
+                model.baseLayer = "topo"
+            }
+            layerRow("map", loc.t("Обычная (онлайн)"),
+                     selected: model.baseLayer == "plain") {
+                model.baseLayer = "plain"
             }
             layerRow("globe.europe.africa", loc.t("Спутник (онлайн)"),
                      selected: model.baseLayer == "satellite") {
@@ -312,7 +322,9 @@ struct ContentView: View {
             }
             .foregroundStyle(.primary)
             .padding(.vertical, 7)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     // MARK: сохранение и открытие

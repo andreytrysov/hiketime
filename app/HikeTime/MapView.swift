@@ -55,7 +55,21 @@ struct MapView: UIViewRepresentable {
         let res = Bundle.main.resourceURL!
             .appendingPathComponent("Tiles/terrarium").path
         let json: String
-        if base == "satellite" {
+        if base == "topo" {
+            json = """
+            {"version":8,"sources":{"otm":{"type":"raster","tileSize":256,
+            "maxzoom":17,"attribution":"© OpenTopoMap (CC-BY-SA), © OpenStreetMap",
+            "tiles":["https://tile.opentopomap.org/{z}/{x}/{y}.png"]}},
+            "layers":[{"id":"otm","type":"raster","source":"otm"}]}
+            """
+        } else if base == "plain" {
+            json = """
+            {"version":8,"sources":{"osm":{"type":"raster","tileSize":256,
+            "maxzoom":19,"attribution":"© OpenStreetMap",
+            "tiles":["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]}},
+            "layers":[{"id":"osm","type":"raster","source":"osm"}]}
+            """
+        } else if base == "satellite" {
             json = """
             {"version":8,"sources":{"sat":{"type":"raster","tileSize":256,
             "maxzoom":18,"attribution":"Esri",

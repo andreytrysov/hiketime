@@ -11,7 +11,6 @@ struct OnboardingView: View {
     @State private var page = 0
     @State private var demoSegments: [Segment] = []
     @State private var demoLoad = 0.0
-    @State private var body_ = 75.0
 
     /// Настоящая тропа Шварцзее → Хёрнлихютте; высоты — из вшитых тайлов.
     private static let demoRoute = [
@@ -35,7 +34,6 @@ struct OnboardingView: View {
                 if page < 2 {
                     withAnimation { page += 1 }
                 } else {
-                    model.bodyKg = body_
                     dismiss()
                 }
             } label: {
@@ -56,7 +54,6 @@ struct OnboardingView: View {
                 .padding(.bottom, 14)
         }
         .task { await loadDemo() }
-        .onAppear { body_ = model.bodyKg }
     }
 
     private func loadDemo() async {
@@ -166,7 +163,7 @@ struct OnboardingView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            Picker("", selection: $body_) {
+            Picker("", selection: $model.bodyKg) {
                 ForEach(35...160, id: \.self) { kg in
                     Text("\(kg) \(loc.t("кг"))").tag(Double(kg))
                 }
