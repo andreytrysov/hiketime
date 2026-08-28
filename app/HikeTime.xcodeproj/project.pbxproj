@@ -1,0 +1,361 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3AD6AD7FA1FEAE6405302E79 /* TileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D65440517EBF6DAF3CCD81 /* TileStore.swift */; };
+		6AA78B476F30ED710E94DD77 /* HikeTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */; };
+		C9A275F78855457703D82F65 /* HikeTimeCore in Frameworks */ = {isa = PBXBuildFile; productRef = 58DB13B84775B7C23BC3221B /* HikeTimeCore */; };
+		D842CFDDA2A5D99CB6928C71 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140B4575684213D3E0515FF0 /* ContentView.swift */; };
+		E2E49AF4D5182B5CF5C95749 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82B48F709125C7612318514 /* MapView.swift */; };
+		E92BC0B95D9EC829B331BF18 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = E4FFA2F1F30A6474C9C7354A /* MapLibre */; };
+		F9FC5BFDD94FC93C8DB7CCDC /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		140B4575684213D3E0515FF0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		35D65440517EBF6DAF3CCD81 /* TileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileStore.swift; sourceTree = "<group>"; };
+		590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HikeTimeApp.swift; sourceTree = "<group>"; };
+		64CE0365814A8EF1132F7EFE /* HikeTime.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HikeTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A82B48F709125C7612318514 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		DA8D6EFE4E5E8E5B31889338 /* HikeTimeCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HikeTimeCore; path = ../swift/HikeTimeCore; sourceTree = SOURCE_ROOT; };
+		FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		70F3EC109312299D0046515B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9A275F78855457703D82F65 /* HikeTimeCore in Frameworks */,
+				E92BC0B95D9EC829B331BF18 /* MapLibre in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3E4D332A12544CEAA1B33E40 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				DA8D6EFE4E5E8E5B31889338 /* HikeTimeCore */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		5ABF9F78448FAECD3E94BFC6 = {
+			isa = PBXGroup;
+			children = (
+				AD2E42B1997B85A2DEBF67F4 /* HikeTime */,
+				3E4D332A12544CEAA1B33E40 /* Packages */,
+				EB60473638F299D1AF2C05DB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AD2E42B1997B85A2DEBF67F4 /* HikeTime */ = {
+			isa = PBXGroup;
+			children = (
+				FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */,
+				140B4575684213D3E0515FF0 /* ContentView.swift */,
+				590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */,
+				A82B48F709125C7612318514 /* MapView.swift */,
+				35D65440517EBF6DAF3CCD81 /* TileStore.swift */,
+			);
+			path = HikeTime;
+			sourceTree = "<group>";
+		};
+		EB60473638F299D1AF2C05DB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				64CE0365814A8EF1132F7EFE /* HikeTime.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2885B65840AD8DA6851E55F8 /* HikeTime */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BFD7B2981208E12734A1D6E /* Build configuration list for PBXNativeTarget "HikeTime" */;
+			buildPhases = (
+				E32BD03C73A582E63EE2A3E0 /* Sources */,
+				70F3EC109312299D0046515B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HikeTime;
+			packageProductDependencies = (
+				58DB13B84775B7C23BC3221B /* HikeTimeCore */,
+				E4FFA2F1F30A6474C9C7354A /* MapLibre */,
+			);
+			productName = HikeTime;
+			productReference = 64CE0365814A8EF1132F7EFE /* HikeTime.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1AE1E6026BCDEEDFCC17BDC6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = E8975C66B2234BA21EF3848D /* Build configuration list for PBXProject "HikeTime" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 5ABF9F78448FAECD3E94BFC6;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				08FE835A2171C262FAC3DC1D /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */,
+				DDB192C443B31AF93882533C /* XCLocalSwiftPackageReference "../swift/HikeTimeCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = EB60473638F299D1AF2C05DB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2885B65840AD8DA6851E55F8 /* HikeTime */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E32BD03C73A582E63EE2A3E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F9FC5BFDD94FC93C8DB7CCDC /* AppModel.swift in Sources */,
+				D842CFDDA2A5D99CB6928C71 /* ContentView.swift in Sources */,
+				6AA78B476F30ED710E94DD77 /* HikeTimeApp.swift in Sources */,
+				E2E49AF4D5182B5CF5C95749 /* MapView.swift in Sources */,
+				3AD6AD7FA1FEAE6405302E79 /* TileStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D27810A43478BDD2CDAEC33 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Показать ваше положение на карте";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.andreytrusov.hiketime;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6F0637332981183AF2FFA606 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Показать ваше положение на карте";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.andreytrusov.hiketime;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		779EE1C953D4C1F0E56C7E64 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F87CC2DE3AD695573BF4556F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8BFD7B2981208E12734A1D6E /* Build configuration list for PBXNativeTarget "HikeTime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6F0637332981183AF2FFA606 /* Debug */,
+				1D27810A43478BDD2CDAEC33 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E8975C66B2234BA21EF3848D /* Build configuration list for PBXProject "HikeTime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				779EE1C953D4C1F0E56C7E64 /* Debug */,
+				F87CC2DE3AD695573BF4556F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DDB192C443B31AF93882533C /* XCLocalSwiftPackageReference "../swift/HikeTimeCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../swift/HikeTimeCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		08FE835A2171C262FAC3DC1D /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/maplibre/maplibre-gl-native-distribution";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		58DB13B84775B7C23BC3221B /* HikeTimeCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HikeTimeCore;
+		};
+		E4FFA2F1F30A6474C9C7354A /* MapLibre */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 08FE835A2171C262FAC3DC1D /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
+			productName = MapLibre;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 1AE1E6026BCDEEDFCC17BDC6 /* Project object */;
+}

@@ -1,0 +1,27 @@
+name: HikeTime
+options:
+  bundleIdPrefix: com.andreytrusov
+  deploymentTarget:
+    iOS: "16.0"
+packages:
+  HikeTimeCore:
+    path: ../swift/HikeTimeCore
+  MapLibre:
+    url: https://github.com/maplibre/maplibre-gl-native-distribution
+    from: 6.0.0
+targets:
+  HikeTime:
+    type: application
+    platform: iOS
+    sources: [HikeTime]
+    dependencies:
+      - package: HikeTimeCore
+      - package: MapLibre
+        product: MapLibre
+    settings:
+      base:
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Показать ваше положение на карте"
+        PRODUCT_BUNDLE_IDENTIFIER: com.andreytrusov.hiketime
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: NO
