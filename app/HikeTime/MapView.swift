@@ -57,6 +57,8 @@ struct MapView: UIViewRepresentable {
             .appendingPathComponent("Tiles/terrarium").path
         let contours = Bundle.main.resourceURL!
             .appendingPathComponent("Tiles/contours.geojson").path
+        let glyphs = Bundle.main.resourceURL!
+            .appendingPathComponent("Tiles/glyphs").path
         // слои горизонталей — из вшитого GeoJSON, посчитанного из тех же
         // terrarium-тайлов при сборке пакета (шаг 100 м, жирные каждые 500)
         let contourSource = """
@@ -70,7 +72,15 @@ struct MapView: UIViewRepresentable {
         {"id":"contour-major","type":"line","source":"contours",
           "filter":["==",["get","major"],1],
           "layout":{"visibility":"none"},
-          "paint":{"line-color":"#8a6d3b","line-opacity":0.65,"line-width":1.4}}
+          "paint":{"line-color":"#8a6d3b","line-opacity":0.65,"line-width":1.4}},
+        {"id":"contour-label","type":"symbol","source":"contours",
+          "filter":["==",["get","major"],1],
+          "layout":{"visibility":"none","symbol-placement":"line",
+            "text-field":["to-string",["get","ele"]],
+            "text-font":["Noto Sans Regular"],"text-size":10,
+            "symbol-spacing":320},
+          "paint":{"text-color":"#7a5f34",
+            "text-halo-color":"#ffffff","text-halo-width":1.2}}
         """
         let json: String
         if base == "topo" {
@@ -89,14 +99,14 @@ struct MapView: UIViewRepresentable {
             """
         } else if base == "satellite" {
             json = """
-            {"version":8,"sources":{"sat":{"type":"raster","tileSize":256,
+            {"version":8,"glyphs":"file://\(glyphs)/{fontstack}/{range}.pbf","sources":{"sat":{"type":"raster","tileSize":256,
             "maxzoom":18,"attribution":"Esri",
             "tiles":["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"]}\(contourSource)},
             "layers":[{"id":"sat","type":"raster","source":"sat"}\(contourLayers)]}
             """
         } else {
             json = """
-            {"version":8,"sources":{"dem":{"type":"raster-dem","encoding":"terrarium",
+            {"version":8,"glyphs":"file://\(glyphs)/{fontstack}/{range}.pbf","sources":{"dem":{"type":"raster-dem","encoding":"terrarium",
             "tileSize":256,"maxzoom":12,
             "tiles":["file://\(res)/{z}/{x}/{y}.png"]}\(contourSource)},
             "layers":[
@@ -204,6 +214,9 @@ struct MapView: UIViewRepresentable {
 
             styleReady = true
             syncRoute()
+            syncSpeedColor()
+            syncContours()
+            syncHighlight()
         }
 
         /// Цвет по скорости: сегменты с зоной 0..3 (медленно -> быстро).
@@ -260,7 +273,7 @@ struct MapView: UIViewRepresentable {
 
         func syncContours() {
             guard styleReady, let map else { return }
-            for id in ["contour-minor", "contour-major"] {
+            for id in ["contour-minor", "contour-major", "contour-label"] {
                 map.style?.layer(withIdentifier: id)?.isVisible = model.contours
             }
         }

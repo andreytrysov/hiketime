@@ -132,7 +132,7 @@ struct ContentView: View {
                                                loadKg: model.loadKg,
                                                terrain: model.terrain,
                                                power: model.power)) {
-                    MapButtonLabel(icon: "share")
+                    MapButtonLabel(icon: "arrowshape.turn.up.right")
                 }
                 .buttonStyle(.plain)
                 MapButton(icon: model.savedId != nil ? "checkmark" : "floppy",
@@ -428,6 +428,7 @@ struct ContentView: View {
     private var emptyHint: some View {
         Text(loc.t("Нажмите ✎ и нарисуйте маршрут пальцем"))
             .font(.footnote)
+            .multilineTextAlignment(.center)
             .foregroundStyle(.secondary)
             .padding(.horizontal, 16)
             .padding(.vertical, 11)

@@ -75,16 +75,10 @@ struct MapButtonLabel: View {
     @ViewBuilder private var glyph: some View {
         if icon == "floppy" {
             FloppyIcon()
-                .stroke(style: StrokeStyle(lineWidth: 1.7,
+                .stroke(style: StrokeStyle(lineWidth: 1.9,
                                            lineCap: .round,
                                            lineJoin: .round))
-                .frame(width: 17, height: 17)
-        } else if icon == "share" {
-            ShareIcon()
-                .stroke(style: StrokeStyle(lineWidth: 1.7,
-                                           lineCap: .round,
-                                           lineJoin: .round))
-                .frame(width: 16, height: 18)
+                .frame(width: 16, height: 16)
         } else {
             Image(systemName: icon)
                 .font(.system(size: big ? 21 : 16, weight: .semibold))
@@ -107,28 +101,6 @@ struct MapButtonLabel: View {
                     .strokeBorder(.black.opacity(0.06), lineWidth: 0.5))
             .foregroundStyle(active ? .white : (tint ?? .primary))
             .shadow(color: .black.opacity(0.14), radius: 5, y: 2)
-    }
-}
-
-/// «Поделиться» — лоток со стрелкой, той же линией, что дискета.
-struct ShareIcon: Shape {
-    func path(in r: CGRect) -> Path {
-        var p = Path()
-        let w = r.width, h = r.height
-        // лоток с разрывом сверху под стрелку
-        p.move(to: CGPoint(x: w * 0.30, y: h * 0.34))
-        p.addLine(to: CGPoint(x: w * 0.10, y: h * 0.34))
-        p.addLine(to: CGPoint(x: w * 0.10, y: h * 0.96))
-        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.96))
-        p.addLine(to: CGPoint(x: w * 0.90, y: h * 0.34))
-        p.addLine(to: CGPoint(x: w * 0.70, y: h * 0.34))
-        // стрелка вверх
-        p.move(to: CGPoint(x: w * 0.50, y: h * 0.62))
-        p.addLine(to: CGPoint(x: w * 0.50, y: h * 0.04))
-        p.move(to: CGPoint(x: w * 0.32, y: h * 0.20))
-        p.addLine(to: CGPoint(x: w * 0.50, y: h * 0.04))
-        p.addLine(to: CGPoint(x: w * 0.68, y: h * 0.20))
-        return p
     }
 }
 
