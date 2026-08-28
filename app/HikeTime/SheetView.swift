@@ -85,11 +85,11 @@ struct SheetView: View {
             }
             Text(value).fontWeight(.semibold).monospacedDigit()
         }
-        .font(.caption)
+        .font(.caption2)
         .lineLimit(1)
-        .minimumScaleFactor(0.6)
+        .minimumScaleFactor(0.85)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
+        .padding(.vertical, 9)
         .padding(.horizontal, 4)
         .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 9))
     }
@@ -230,16 +230,19 @@ struct SheetView: View {
                     }
                 }
                 .chartYScale(domain: (lo - pad)...(hi + pad))
+                .chartXScale(domain: 0...(model.chartDistKm.last ?? 1))
                 .chartYAxis(.hidden)
                 .chartXAxis {
-                    AxisMarks(values: .automatic(desiredCount: 5)) {
-                        AxisTick(stroke: StrokeStyle(lineWidth: 1))
-                            .foregroundStyle(Color(.systemGray4))
+                    let total = model.chartDistKm.last ?? 1
+                    let step: Double = total <= 6 ? 1 : total <= 14 ? 2 : 5
+                    AxisMarks(values: Array(stride(from: 0, through: total,
+                                                   by: step))) {
                         AxisValueLabel()
                             .font(.caption2)
                             .foregroundStyle(Color(.secondaryLabel))
                     }
                 }
+                .chartPlotStyle { $0.background(.clear) }
                 .frame(height: 110)
                 .chartOverlay { proxy in
                     GeometryReader { geo in
