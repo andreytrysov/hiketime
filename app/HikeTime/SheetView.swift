@@ -2,9 +2,7 @@ import SwiftUI
 import Charts
 import HikeTimeCore
 
-/// Нижняя шторка с тремя позициями — как в прототипе:
-/// середина — ввод (рюкзак, покрытие, темп), полная — анализ
-/// (профиль высот, плитки). Тянется за ручку.
+/// Нижняя шторка — визуально один в один с веб-прототипом.
 struct SheetView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var loc: Loc
@@ -19,18 +17,18 @@ struct SheetView: View {
                 .fill(Color(.systemGray3))
                 .frame(width: 38, height: 4)
                 .padding(.top, 9)
-                .padding(.bottom, 8)
+                .padding(.bottom, 10)
 
             VStack(spacing: 10) {
                 chips
                 weightBlock
-                pickersRow
+                selectsRow
                 if position == .full {
-                    analysis
-                        .transition(.opacity)
+                    profileChart
+                    tiles
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity)
@@ -63,13 +61,14 @@ struct SheetView: View {
         .onDisappear { model.sheetExpanded = false }
     }
 
-    // MARK: чипы «в движении · привалы · обед»
+    // MARK: чипы
 
     private var chips: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             chip(loc.t("в движении"), model.movingHoursText)
             if model.shortBreaks > 0 {
-                chip(loc.t("привалы"), "\(model.shortBreaks) × 10 \(loc.t("мин"))")
+                chip(loc.t("привалы"),
+                     "\(model.shortBreaks) × 10 \(loc.t("мин"))")
             } else {
                 chip("", loc.t("без привалов"))
             }
@@ -90,50 +89,57 @@ struct SheetView: View {
         .lineLimit(1)
         .minimumScaleFactor(0.6)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
         .padding(.horizontal, 4)
         .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 9))
     }
 
     // MARK: рюкзак
 
+    private var zonePercent: Double { model.loadKg / model.bodyKg * 100 }
+
     private var zoneText: String {
-        let p = model.loadKg / model.bodyKg * 100
         let key: String
-        switch p {
+        switch zonePercent {
         case ..<10: key = "% массы тела — вес почти не мешает"
         case ..<20: key = "% массы тела — нормальная многодневка"
         case ..<25: key = "% массы тела — тяжело, риск растёт"
         case ..<30: key = "% массы тела — расход выше на треть"
         default: key = "% массы тела — так ходить не надо"
         }
-        return String(format: "%.0f", p) + loc.t(key)
+        var out = String(format: "%.0f", zonePercent) + loc.t(key)
+        if model.hasRoute {
+            out += " · " + loc.f("+1 кг = +%d мин", model.sensMinutes)
+        }
+        return out
     }
 
     private var weightBlock: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 6) {
             HStack {
                 Text(loc.t("Рюкзак"))
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Spacer()
                 Text("\(Int(model.loadKg)) \(loc.t("кг"))")
                     .font(.headline)
                     .monospacedDigit()
             }
-            Slider(value: $model.loadKg, in: 0...40, step: 1)
-                .tint(Theme.zone(model.loadKg / model.bodyKg * 100))
+            ZoneSlider(value: $model.loadKg, range: 0...40,
+                       fill: Theme.zone(zonePercent),
+                       ticks: [10, 20, 25, 30].map { model.bodyKg * $0 / 100 })
             HStack {
                 Text(zoneText)
-                    .font(.caption2)
-                    .foregroundStyle(Theme.zone(model.loadKg / model.bodyKg * 100))
+                    .font(.caption)
+                    .foregroundStyle(Theme.zone(zonePercent))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 Spacer()
-                Text(loc.f("+1 кг = +%d мин", model.sensMinutes))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
             }
         }
     }
+
+    // MARK: селекты с подписями (как в прототипе)
 
     private var terrainTitle: String {
         switch model.terrain {
@@ -151,35 +157,36 @@ struct SheetView: View {
         }
     }
 
-    private var pickersRow: some View {
-        HStack(spacing: 8) {
-            CompactSelect(value: terrainTitle,
+    private var selectsRow: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(loc.t("Покрытие"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                SelectBox(value: terrainTitle,
                           options: [loc.t("Тропа"), loc.t("Тундра, кусты"),
                                     loc.t("Болото, камни")]) { p in
-                if p == loc.t("Тундра, кусты") { model.terrain = 1.55 }
-                else if p == loc.t("Болото, камни") { model.terrain = 1.9 }
-                else { model.terrain = 1.0 }
+                    if p == loc.t("Тундра, кусты") { model.terrain = 1.55 }
+                    else if p == loc.t("Болото, камни") { model.terrain = 1.9 }
+                    else { model.terrain = 1.0 }
+                }
             }
-            .frame(maxWidth: .infinity)
-            CompactSelect(value: paceTitle,
+            VStack(alignment: .leading, spacing: 4) {
+                Text(loc.t("Темп"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                SelectBox(value: paceTitle,
                           options: [loc.t("Медленно"), loc.t("Обычно"),
                                     loc.t("Быстро")]) { p in
-                if p == loc.t("Медленно") { model.power = 3.0 }
-                else if p == loc.t("Быстро") { model.power = 4.3 }
-                else { model.power = 3.6 }
+                    if p == loc.t("Медленно") { model.power = 3.0 }
+                    else if p == loc.t("Быстро") { model.power = 4.3 }
+                    else { model.power = 3.6 }
+                }
             }
-            .frame(maxWidth: .infinity)
         }
     }
 
-    // MARK: анализ (полная позиция)
-
-    private var analysis: some View {
-        VStack(spacing: 10) {
-            profileChart
-            tiles
-        }
-    }
+    // MARK: профиль
 
     private var profileChart: some View {
         VStack(spacing: 2) {
@@ -191,7 +198,7 @@ struct SheetView: View {
                 if let i = model.highlightIndex,
                    let prof = model.profile,
                    i < prof.elevations.count, i < model.chartDistKm.count {
-                    Text(String(format: "%.1f км · %.0f м",
+                    Text(String(format: "%.1f \(loc.t("единица_км")) · %.0f \(loc.t("единица_м"))",
                                 model.chartDistKm[i], prof.elevations[i]))
                         .font(.caption)
                         .fontWeight(.semibold)
@@ -209,13 +216,12 @@ struct SheetView: View {
                                  yStart: .value("м", lo - pad),
                                  yEnd: .value("м", pts[i].1))
                             .interpolationMethod(.monotone)
-                            .foregroundStyle(
-                                Theme.accent.opacity(0.15))
+                            .foregroundStyle(Theme.accent.opacity(0.13))
                         LineMark(x: .value("км", pts[i].0),
                                  y: .value("м", pts[i].1))
                             .interpolationMethod(.monotone)
-                            .foregroundStyle(
-                                Theme.accent)
+                            .foregroundStyle(Theme.accent)
+                            .lineStyle(StrokeStyle(lineWidth: 1.8))
                     }
                     if let i = model.highlightIndex, i < pts.count {
                         PointMark(x: .value("км", pts[i].0),
@@ -224,12 +230,15 @@ struct SheetView: View {
                     }
                 }
                 .chartYScale(domain: (lo - pad)...(hi + pad))
-                .chartYAxis {
-                    AxisMarks(position: .trailing,
-                              values: .automatic(desiredCount: 3))
-                }
+                .chartYAxis(.hidden)
                 .chartXAxis {
-                    AxisMarks(values: .automatic(desiredCount: 5))
+                    AxisMarks(values: .automatic(desiredCount: 5)) {
+                        AxisTick(stroke: StrokeStyle(lineWidth: 1))
+                            .foregroundStyle(Color(.systemGray4))
+                        AxisValueLabel()
+                            .font(.caption2)
+                            .foregroundStyle(Color(.secondaryLabel))
+                    }
                 }
                 .frame(height: 110)
                 .chartOverlay { proxy in
@@ -266,12 +275,17 @@ struct SheetView: View {
         model.highlightIndex = best
     }
 
+    // MARK: плитки
+
     private var tiles: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())],
                   spacing: 8) {
-            tile(loc.t("набор"), String(format: "%.0f %@", model.gainMeters, loc.t("единица_м")))
-            tile(loc.t("сброс"), String(format: "%.0f %@", model.lossMeters, loc.t("единица_м")))
-            tile(loc.t("средний темп"), String(format: "%.1f %@", model.paceKmh, loc.t("единица_кмч")))
+            tile(loc.t("набор"),
+                 String(format: "%.0f %@", model.gainMeters, loc.t("единица_м")))
+            tile(loc.t("сброс"),
+                 String(format: "%.0f %@", model.lossMeters, loc.t("единица_м")))
+            tile(loc.t("средний темп"),
+                 String(format: "%.1f %@", model.paceKmh, loc.t("единица_кмч")))
             tile(loc.t("без учёта рельефа"), model.naiveText)
         }
     }
@@ -289,5 +303,94 @@ struct SheetView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
         .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+/// Селект прототипа: рамка, значение слева, шеврон вниз справа.
+struct SelectBox: View {
+    let value: String
+    let options: [String]
+    let onPick: (String) -> Void
+
+    var body: some View {
+        Menu {
+            ForEach(options, id: \.self) { o in
+                Button(o) { onPick(o) }
+            }
+        } label: {
+            HStack {
+                Text(value)
+                    .font(.subheadline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 4)
+                Image(systemName: "chevron.down")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity)
+            .background(Color(.systemBackground),
+                        in: RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(Color(.systemGray4), lineWidth: 1))
+            .foregroundStyle(.primary)
+        }
+        .buttonStyle(.plain)
+        .tint(.primary)
+    }
+}
+
+/// Слайдер прототипа: цветная заливка зоны и риски порогов на треке.
+struct ZoneSlider: View {
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    let fill: Color
+    let ticks: [Double]
+
+    var body: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let frac = (value - range.lowerBound)
+                     / (range.upperBound - range.lowerBound)
+            let x = w * frac
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color(.systemGray5))
+                    .frame(height: 6)
+                Capsule()
+                    .fill(fill)
+                    .frame(width: max(x, 6), height: 6)
+                ForEach(ticks, id: \.self) { t in
+                    let tf = (t - range.lowerBound)
+                           / (range.upperBound - range.lowerBound)
+                    if tf > 0.01 && tf < 0.99 {
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(.black.opacity(0.18))
+                            .frame(width: 2, height: 12)
+                            .position(x: w * tf, y: geo.size.height / 2)
+                    }
+                }
+                Circle()
+                    .fill(.white)
+                    .frame(width: 26, height: 26)
+                    .shadow(color: .black.opacity(0.25), radius: 3, y: 1)
+                    .position(x: min(max(x, 13), w - 13),
+                              y: geo.size.height / 2)
+            }
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { g in
+                        let f = min(max(g.location.x / w, 0), 1)
+                        let raw = range.lowerBound
+                                + f * (range.upperBound - range.lowerBound)
+                        value = raw.rounded()
+                    }
+            )
+        }
+        .frame(height: 30)
     }
 }

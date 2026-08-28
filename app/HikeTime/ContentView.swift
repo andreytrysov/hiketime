@@ -176,20 +176,22 @@ struct ContentView: View {
 
     private var routesPanel: some View {
         PanelCard(alignment: .topLeading) {
-            Text(loc.t("Мои маршруты").uppercased())
-                .font(.caption2)
-                .foregroundStyle(.secondary)
             if model.hasRoute {
                 ShareLink(item: RouteShare.url(path: model.path,
                                                loadKg: model.loadKg,
                                                terrain: model.terrain,
                                                power: model.power)) {
-                    PanelRow(icon: "square.and.arrow.up",
-                             text: loc.t("Поделиться текущим маршрутом"),
-                             tint: Theme.accent)
+                    Text(loc.t("Поделиться ссылкой"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.accent)
+                        .padding(.vertical, 6)
                 }
+                .buttonStyle(.plain)
                 Divider()
             }
+            Text(loc.t("Мои маршруты").uppercased())
+                .font(.caption2)
+                .foregroundStyle(.secondary)
             if store.routes.isEmpty {
                 Text(loc.t("Пока пусто — нарисуйте и сохраните"))
                     .font(.caption)
@@ -237,38 +239,43 @@ struct ContentView: View {
             Text(loc.t("Настройки").uppercased())
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-            HStack {
+            HStack(spacing: 8) {
                 Text(loc.t("Вес тела"))
                     .font(.subheadline)
                 Spacer()
-                CompactSelect(
-                    value: "\(Int(model.bodyKg)) \(loc.t("кг"))",
-                    options: (35...160).map { "\($0)" }) { picked in
-                        if let v = Double(picked) { model.bodyKg = v }
-                    }
+                SelectBox(value: "\(Int(model.bodyKg))",
+                          options: (35...160).map { "\($0)" }) { picked in
+                    if let v = Double(picked) { model.bodyKg = v }
+                }
+                .frame(width: 86)
+                Text(loc.t("кг"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
             Divider()
-            HStack {
+            HStack(spacing: 8) {
                 Text(loc.t("Язык"))
                     .font(.subheadline)
                 Spacer()
-                CompactSelect(
-                    value: languageTitle,
-                    options: [loc.t("Системный"), "Русский", "English"]) { picked in
-                        switch picked {
-                        case "Русский": loc.language = AppLanguage.ru.rawValue
-                        case "English": loc.language = AppLanguage.en.rawValue
-                        default: loc.language = AppLanguage.system.rawValue
-                        }
+                SelectBox(value: languageTitle,
+                          options: [loc.t("Системный"), "Русский", "English"]) { picked in
+                    switch picked {
+                    case "Русский": loc.language = AppLanguage.ru.rawValue
+                    case "English": loc.language = AppLanguage.en.rawValue
+                    default: loc.language = AppLanguage.system.rawValue
                     }
+                }
+                .frame(width: 132)
             }
             Divider()
             Button {
                 panel = .none
                 showOnboarding = true
             } label: {
-                PanelRow(icon: "questionmark.circle",
-                         text: loc.t("Как это работает"), tint: .primary)
+                Text(loc.t("Как это работает"))
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                    .padding(.vertical, 6)
             }
             .buttonStyle(.plain)
         }
@@ -284,52 +291,62 @@ struct ContentView: View {
 
     private var layersPanel: some View {
         PanelCard(alignment: .topTrailing) {
-            Text(loc.t("Слои").uppercased())
+            Text(loc.t("Подложка").uppercased())
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-            layerRow("mountain.2", loc.t("Рельеф (оффлайн)"),
+            layerRow(loc.t("Рельеф (оффлайн)"),
                      selected: model.baseLayer == "hillshade") {
                 model.baseLayer = "hillshade"
             }
-            layerRow("point.topleft.down.curvedto.point.bottomright.up",
-                     loc.t("Топо (онлайн)"),
+            layerRow(loc.t("Топо (онлайн)"),
                      selected: model.baseLayer == "topo") {
                 model.baseLayer = "topo"
             }
-            layerRow("map", loc.t("Обычная (онлайн)"),
+            layerRow(loc.t("Обычная (онлайн)"),
                      selected: model.baseLayer == "plain") {
                 model.baseLayer = "plain"
             }
-            layerRow("globe.europe.africa", loc.t("Спутник (онлайн)"),
+            layerRow(loc.t("Спутник (онлайн)"),
                      selected: model.baseLayer == "satellite") {
                 model.baseLayer = "satellite"
             }
             Divider()
-            layerRow("speedometer", loc.t("Цвет по скорости"),
+            Text(loc.t("Поверх").uppercased())
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(loc.t("Линии высот"))
+                .font(.subheadline)
+                .foregroundStyle(.secondary.opacity(0.6))
+                .padding(.vertical, 7)
+                .padding(.horizontal, 10)
+            Divider()
+            Text(loc.t("Маршрут").uppercased())
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            layerRow(loc.t("Цвет по скорости"),
                      selected: model.speedColor) {
                 model.speedColor.toggle()
             }
         }
     }
 
-    private func layerRow(_ icon: String, _ text: String, selected: Bool,
+    private func layerRow(_ text: String, selected: Bool,
                           action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.caption)
-                    .frame(width: 18)
                 Text(text)
-                    .font(.subheadline)
+                    .font(.subheadline.weight(selected ? .semibold : .regular))
                 Spacer()
                 if selected {
                     Image(systemName: "checkmark")
                         .font(.caption.weight(.bold))
-                        .foregroundStyle(Theme.accent)
                 }
             }
-            .foregroundStyle(.primary)
-            .padding(.vertical, 7)
+            .foregroundStyle(selected ? Theme.accent : .primary)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 10)
+            .background(selected ? Theme.accent.opacity(0.1) : .clear,
+                        in: RoundedRectangle(cornerRadius: 9))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
