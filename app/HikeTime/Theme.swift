@@ -80,9 +80,14 @@ struct MapButtonLabel: View {
                                            lineJoin: .round))
                 .frame(width: 16, height: 16)
         } else {
+            // глиф шеринга у SF выше остальных — уменьшаем до общей
+            // оптической массы и чуть поднимаем стрелку над центром
+            let size: CGFloat = icon == "square.and.arrow.up" ? 14.5
+                              : (big ? 21 : 16)
             Image(systemName: icon)
-                .font(.system(size: big ? 21 : 16, weight: .semibold))
+                .font(.system(size: size, weight: .semibold))
                 .symbolRenderingMode(.hierarchical)
+                .offset(y: icon == "square.and.arrow.up" ? -0.5 : 0)
         }
     }
 
