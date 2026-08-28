@@ -132,7 +132,7 @@ struct ContentView: View {
                                                loadKg: model.loadKg,
                                                terrain: model.terrain,
                                                power: model.power)) {
-                    MapButtonLabel(icon: "arrowshape.turn.up.right")
+                    MapButtonLabel(icon: "link")
                 }
                 .buttonStyle(.plain)
                 MapButton(icon: model.savedId != nil ? "checkmark" : "floppy",
