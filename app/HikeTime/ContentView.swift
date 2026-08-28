@@ -132,7 +132,7 @@ struct ContentView: View {
                                                loadKg: model.loadKg,
                                                terrain: model.terrain,
                                                power: model.power)) {
-                    MapButtonLabel(icon: "square.and.arrow.up")
+                    MapButtonLabel(icon: "share")
                 }
                 .buttonStyle(.plain)
                 MapButton(icon: model.savedId != nil ? "checkmark" : "floppy",
@@ -197,39 +197,11 @@ struct ContentView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 6)
+            } else if store.routes.count > 4 {
+                ScrollView { routeRows }
+                    .frame(height: 250)
             } else {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(store.routes) { r in
-                            HStack {
-                                Button {
-                                    open(r)
-                                } label: {
-                                    VStack(alignment: .leading, spacing: 1) {
-                                        Text(r.name)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.primary)
-                                            .lineLimit(1)
-                                        Text("\(String(format: "%.1f", r.distM/1000)) \(loc.t("единица_км")) · \(r.timeText)")
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                                Spacer()
-                                Button {
-                                    deleteCandidate = r
-                                } label: {
-                                    Image(systemName: "xmark")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(Theme.danger)
-                                        .padding(6)
-                                }
-                            }
-                            .padding(.vertical, 5)
-                        }
-                    }
-                }
-                .frame(maxHeight: 260)
+                routeRows
             }
         }
     }
@@ -326,6 +298,41 @@ struct ContentView: View {
             layerRow(loc.t("Цвет по скорости"),
                      selected: model.speedColor) {
                 model.speedColor.toggle()
+            }
+        }
+    }
+
+    private var routeRows: some View {
+        VStack(spacing: 0) {
+            ForEach(store.routes) { r in
+                HStack {
+                    Button {
+                        open(r)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(r.name)
+                                .font(.subheadline)
+                                .foregroundStyle(.primary)
+                                .lineLimit(1)
+                            Text("\(String(format: "%.1f", r.distM/1000)) \(loc.t("единица_км")) · \(r.timeText)")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    Button {
+                        deleteCandidate = r
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Theme.danger)
+                            .padding(6)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.vertical, 5)
             }
         }
     }

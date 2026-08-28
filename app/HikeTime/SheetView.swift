@@ -258,9 +258,6 @@ struct SheetView: View {
                                             highlight(km: km)
                                         }
                                     }
-                                    .onEnded { _ in
-                                        model.highlightIndex = nil
-                                    }
                             )
                     }
                 }
