@@ -32,13 +32,22 @@ struct MapView: UIViewRepresentable {
         context.coordinator.syncRoute()
     }
 
-    /// Стиль: онлайн-топо для первой сборки. Оффлайн-пакеты — следующий шаг.
+    /// Стиль: отмывка рельефа из вшитых terrarium-тайлов — оффлайн,
+    /// без сети и VPN, и легально (AWS Open Data, массовая выгрузка разрешена).
+    /// OSM-растр в пакет класть нельзя — их политика запрещает выкачивание.
     private static func styleURL() -> URL {
+        let res = Bundle.main.resourceURL!
+            .appendingPathComponent("Tiles/terrarium").path
         let json = """
-        {"version":8,"sources":{"topo":{"type":"raster","tileSize":256,"maxzoom":17,
-        "attribution":"© OpenStreetMap",
-        "tiles":["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]}},
-        "layers":[{"id":"topo","type":"raster","source":"topo"}]}
+        {"version":8,"sources":{"dem":{"type":"raster-dem","encoding":"terrarium",
+        "tileSize":256,"maxzoom":12,
+        "tiles":["file://\(res)/{z}/{x}/{y}.png"]}},
+        "layers":[
+          {"id":"bg","type":"background","paint":{"background-color":"#eef1ec"}},
+          {"id":"hills","type":"hillshade","source":"dem",
+           "paint":{"hillshade-exaggeration":0.6,
+                    "hillshade-shadow-color":"#5a5a4d",
+                    "hillshade-highlight-color":"#ffffff"}}]}
         """
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("style.json")

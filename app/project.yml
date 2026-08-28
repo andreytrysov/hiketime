@@ -14,7 +14,11 @@ targets:
   HikeTime:
     type: application
     platform: iOS
-    sources: [HikeTime]
+    sources:
+      - HikeTime
+      - path: Tiles
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: HikeTimeCore
       - package: MapLibre

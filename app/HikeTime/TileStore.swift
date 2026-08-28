@@ -37,6 +37,13 @@ actor TileStore {
     }
 
     private func load(_ key: DEM.TileKey) async throws -> DEM.Tile {
+        // сперва вшитый пакет — без сети и VPN
+        if let bundled = Bundle.main.resourceURL?
+            .appendingPathComponent("Tiles/terrarium/\(key.z)/\(key.x)/\(key.y).png"),
+           let data = try? Data(contentsOf: bundled),
+           let tile = DEM.Tile(pngData: data) {
+            return tile
+        }
         let file = diskDir.appendingPathComponent("\(key.z)_\(key.x)_\(key.y).png")
         if let data = try? Data(contentsOf: file), let t = DEM.Tile(pngData: data) {
             return t

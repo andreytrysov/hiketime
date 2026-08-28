@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0971CEBD3A9E4BDA033EF9B6 /* Tiles in Resources */ = {isa = PBXBuildFile; fileRef = BB15CA97A89F93E1193E99FA /* Tiles */; };
 		3AD6AD7FA1FEAE6405302E79 /* TileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D65440517EBF6DAF3CCD81 /* TileStore.swift */; };
 		6AA78B476F30ED710E94DD77 /* HikeTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */; };
 		C9A275F78855457703D82F65 /* HikeTimeCore in Frameworks */ = {isa = PBXBuildFile; productRef = 58DB13B84775B7C23BC3221B /* HikeTimeCore */; };
@@ -22,6 +23,7 @@
 		590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HikeTimeApp.swift; sourceTree = "<group>"; };
 		64CE0365814A8EF1132F7EFE /* HikeTime.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HikeTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A82B48F709125C7612318514 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		BB15CA97A89F93E1193E99FA /* Tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Tiles; sourceTree = SOURCE_ROOT; };
 		DA8D6EFE4E5E8E5B31889338 /* HikeTimeCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HikeTimeCore; path = ../swift/HikeTimeCore; sourceTree = SOURCE_ROOT; };
 		FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,6 +52,7 @@
 		5ABF9F78448FAECD3E94BFC6 = {
 			isa = PBXGroup;
 			children = (
+				BB15CA97A89F93E1193E99FA /* Tiles */,
 				AD2E42B1997B85A2DEBF67F4 /* HikeTime */,
 				3E4D332A12544CEAA1B33E40 /* Packages */,
 				EB60473638F299D1AF2C05DB /* Products */,
@@ -84,6 +87,7 @@
 			buildConfigurationList = 8BFD7B2981208E12734A1D6E /* Build configuration list for PBXNativeTarget "HikeTime" */;
 			buildPhases = (
 				E32BD03C73A582E63EE2A3E0 /* Sources */,
+				43FFF920C48233FEFBCDF713 /* Resources */,
 				70F3EC109312299D0046515B /* Frameworks */,
 			);
 			buildRules = (
@@ -132,6 +136,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		43FFF920C48233FEFBCDF713 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0971CEBD3A9E4BDA033EF9B6 /* Tiles in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E32BD03C73A582E63EE2A3E0 /* Sources */ = {
