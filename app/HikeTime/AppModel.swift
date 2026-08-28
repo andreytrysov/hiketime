@@ -84,8 +84,11 @@ final class AppModel: ObservableObject {
                                                  store: TileStore) async throws -> RouteProfile {
         // высоты тянутся заранее и асинхронно, сам конвейер синхронный
         let dense = Geo.resample(points, step: 25)
-        try await store.prefetch(points: dense, zoom: 12)
-        return try RouteBuilder.build(points: points, provider: store.cachedProvider())
+        let tiles = try await store.tilesFor(points: dense, zoom: 12)
+        return try RouteBuilder.build(points: points) { key in
+            guard let t = tiles[key] else { throw DEM.DEMError.tileUnavailable(key) }
+            return t
+        }
     }
 
     func recomputeTime() {

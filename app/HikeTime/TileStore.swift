@@ -15,7 +15,9 @@ actor TileStore {
         return d
     }()
 
-    func prefetch(points: [GeoPoint], zoom: Int) async throws {
+    /// Скачивает недостающие тайлы и отдаёт снимок — синхронному
+    /// RouteBuilder не нужен доступ в актор.
+    func tilesFor(points: [GeoPoint], zoom: Int) async throws -> [DEM.TileKey: DEM.Tile] {
         var needed = Set<DEM.TileKey>()
         for p in points {
             let g = DEM.toGlobalPixels(lat: p.lat, lon: p.lon, zoom: zoom)
@@ -31,28 +33,7 @@ actor TileStore {
         for key in needed where tiles[key] == nil {
             tiles[key] = try await load(key)
         }
-    }
-
-    /// Провайдер по уже скачанному — для синхронного RouteBuilder.
-    nonisolated func cachedProvider() -> DEM.TileProvider {
-        let snapshot = { [weak self] in self }
-        return { key in
-            // actor уже прогрет prefetch-ем; провайдер зовётся синхронно
-            guard let store = snapshot(),
-                  let tile = store.tileSync(key) else {
-                throw DEM.DEMError.tileUnavailable(key)
-            }
-            return tile
-        }
-    }
-
-    nonisolated private func tileSync(_ key: DEM.TileKey) -> DEM.Tile? {
-        // безопасно: словарь заполняется до вызова, читается после prefetch
-        var result: DEM.Tile?
-        let sem = DispatchSemaphore(value: 0)
-        Task { result = await self.tiles[key]; sem.signal() }
-        sem.wait()
-        return result
+        return tiles.filter { needed.contains($0.key) }
     }
 
     private func load(_ key: DEM.TileKey) async throws -> DEM.Tile {

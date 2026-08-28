@@ -1,0 +1,4 @@
+module HikeTimeCore {
+header "HikeTimeCore-Swift.h"
+export *
+}

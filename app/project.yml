@@ -1,5 +1,6 @@
 name: HikeTime
 options:
+  xcodeVersion: "15.4"
   bundleIdPrefix: com.andreytrusov
   deploymentTarget:
     iOS: "16.0"
@@ -20,6 +21,10 @@ targets:
         product: MapLibre
     settings:
       base:
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: "0.1"
+        INFOPLIST_KEY_CFBundleDisplayName: HikeTime
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Показать ваше положение на карте"
         PRODUCT_BUNDLE_IDENTIFIER: com.andreytrusov.hiketime

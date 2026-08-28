@@ -1,0 +1,58 @@
+{
+  "" : {
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTime-master.dia",
+    "emit-module-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTime-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTime-master-emit-module.dia",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTime-master.swiftdeps"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/app/HikeTime/AppModel.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel.dia",
+    "index-unit-output-path" : "/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/AppModel~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/app/HikeTime/ContentView.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/app/HikeTime/HikeTimeApp.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp.dia",
+    "index-unit-output-path" : "/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/HikeTimeApp~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/app/HikeTime/MapView.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView.dia",
+    "index-unit-output-path" : "/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/MapView~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/app/HikeTime/TileStore.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore.dia",
+    "index-unit-output-path" : "/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTime.build/Debug-iphonesimulator/HikeTime.build/Objects-normal/arm64/TileStore~partial.swiftmodule"
+  }
+}

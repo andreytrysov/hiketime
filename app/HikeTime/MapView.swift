@@ -36,8 +36,8 @@ struct MapView: UIViewRepresentable {
     private static func styleURL() -> URL {
         let json = """
         {"version":8,"sources":{"topo":{"type":"raster","tileSize":256,"maxzoom":17,
-        "attribution":"© OpenTopoMap (CC-BY-SA), © OpenStreetMap",
-        "tiles":["https://a.tile.opentopomap.org/{z}/{x}/{y}.png"]}},
+        "attribution":"© OpenStreetMap",
+        "tiles":["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]}},
         "layers":[{"id":"topo","type":"raster","source":"topo"}]}
         """
         let url = FileManager.default.temporaryDirectory

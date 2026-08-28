@@ -1,0 +1,8 @@
+Target dependency graph (4 targets)
+Target 'HikeTime' in project 'HikeTime'
+➜ Explicit dependency on target 'HikeTimeCore' in project 'HikeTimeCore'
+➜ Explicit dependency on target 'MapLibre' in project 'MapLibre Native'
+Target 'MapLibre' in project 'MapLibre Native' (no dependencies)
+Target 'HikeTimeCore' in project 'HikeTimeCore'
+➜ Explicit dependency on target 'HikeTimeCore' in project 'HikeTimeCore'
+Target 'HikeTimeCore' in project 'HikeTimeCore' (no dependencies)

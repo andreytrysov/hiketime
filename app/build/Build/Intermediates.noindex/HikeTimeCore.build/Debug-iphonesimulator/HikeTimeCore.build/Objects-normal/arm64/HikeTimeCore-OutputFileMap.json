@@ -1,0 +1,68 @@
+{
+  "" : {
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/HikeTimeCore-master.dia",
+    "emit-module-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/HikeTimeCore-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/HikeTimeCore-master-emit-module.dia",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/HikeTimeCore-master.swiftdeps"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/DEM.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM.dia",
+    "index-unit-output-path" : "/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/DEM~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/Geo.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo.dia",
+    "index-unit-output-path" : "/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/Geo~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/GPX.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX.dia",
+    "index-unit-output-path" : "/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/GPX~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteBuilder.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder.dia",
+    "index-unit-output-path" : "/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteBuilder~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/RouteEditing.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing.dia",
+    "index-unit-output-path" : "/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/RouteEditing~partial.swiftmodule"
+  },
+  "/Users/andreytrusov/Documents/Claude/hiketime/swift/HikeTimeCore/Sources/HikeTimeCore/TimeModel.swift" : {
+    "const-values" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel.swiftconstvalues",
+    "dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel.d",
+    "diagnostics" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel.dia",
+    "index-unit-output-path" : "/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel.o",
+    "llvm-bc" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel.bc",
+    "object" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel.o",
+    "swift-dependencies" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel.swiftdeps",
+    "swiftmodule" : "/Users/andreytrusov/Documents/Claude/hiketime/app/build/Build/Intermediates.noindex/HikeTimeCore.build/Debug-iphonesimulator/HikeTimeCore.build/Objects-normal/arm64/TimeModel~partial.swiftmodule"
+  }
+}
