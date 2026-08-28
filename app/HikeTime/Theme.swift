@@ -65,13 +65,12 @@ struct FloppyIcon: Shape {
     }
 }
 
-/// Круглая кнопка карты — единый вид для всех плавающих действий.
-struct MapButton: View {
+/// Ярлык круглой кнопки — используется и кнопками, и ShareLink.
+struct MapButtonLabel: View {
     let icon: String
     var active = false
     var big = false
     var tint: Color? = nil
-    let action: () -> Void
 
     @ViewBuilder private var glyph: some View {
         if icon == "floppy" {
@@ -88,21 +87,34 @@ struct MapButton: View {
     }
 
     var body: some View {
+        glyph
+            .frame(width: big ? Theme.buttonBig : Theme.button,
+                   height: big ? Theme.buttonBig : Theme.button)
+            .background(
+                active ? AnyShapeStyle(Theme.accent)
+                       : AnyShapeStyle(.regularMaterial),
+                in: RoundedRectangle(cornerRadius: big ? Theme.radiusM
+                                                       : Theme.radiusS))
+            .overlay(
+                RoundedRectangle(cornerRadius: big ? Theme.radiusM
+                                                   : Theme.radiusS)
+                    .strokeBorder(.black.opacity(0.06), lineWidth: 0.5))
+            .foregroundStyle(active ? .white : (tint ?? .primary))
+            .shadow(color: .black.opacity(0.14), radius: 5, y: 2)
+    }
+}
+
+/// Круглая кнопка карты.
+struct MapButton: View {
+    let icon: String
+    var active = false
+    var big = false
+    var tint: Color? = nil
+    let action: () -> Void
+
+    var body: some View {
         Button(action: action) {
-            glyph
-                .frame(width: big ? Theme.buttonBig : Theme.button,
-                       height: big ? Theme.buttonBig : Theme.button)
-                .background(
-                    active ? AnyShapeStyle(Theme.accent)
-                           : AnyShapeStyle(.regularMaterial),
-                    in: RoundedRectangle(cornerRadius: big ? Theme.radiusM
-                                                           : Theme.radiusS))
-                .overlay(
-                    RoundedRectangle(cornerRadius: big ? Theme.radiusM
-                                                       : Theme.radiusS)
-                        .strokeBorder(.black.opacity(0.06), lineWidth: 0.5))
-                .foregroundStyle(active ? .white : (tint ?? .primary))
-                .shadow(color: .black.opacity(0.14), radius: 5, y: 2)
+            MapButtonLabel(icon: icon, active: active, big: big, tint: tint)
         }
         .buttonStyle(.plain)
     }

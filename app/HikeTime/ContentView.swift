@@ -126,6 +126,15 @@ struct ContentView: View {
         VStack(alignment: .trailing, spacing: 10) {
             Spacer()
             if model.hasRoute {
+                // удаление — всегда верхнее из инструментов
+                MapButton(icon: "xmark", tint: Theme.danger) { askClear = true }
+                ShareLink(item: RouteShare.url(path: model.path,
+                                               loadKg: model.loadKg,
+                                               terrain: model.terrain,
+                                               power: model.power)) {
+                    MapButtonLabel(icon: "square.and.arrow.up")
+                }
+                .buttonStyle(.plain)
                 MapButton(icon: model.savedId != nil ? "checkmark" : "floppy",
                           active: model.savedId != nil) {
                     if model.savedId == nil {
@@ -133,7 +142,6 @@ struct ContentView: View {
                         askName = true
                     }
                 }
-                MapButton(icon: "xmark", tint: Theme.danger) { askClear = true }
                 MapButton(icon: "arrow.uturn.backward") { model.undo() }
             }
             HStack(spacing: 10) {

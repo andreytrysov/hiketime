@@ -34,9 +34,12 @@ struct SheetView: View {
             .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity)
-        .background(.regularMaterial,
-                    in: UnevenRoundedRectangle(topLeadingRadius: 18,
-                                               topTrailingRadius: 18))
+        .background {
+            UnevenRoundedRectangle(topLeadingRadius: 18,
+                                   topTrailingRadius: 18)
+                .fill(.regularMaterial)
+                .ignoresSafeArea(edges: .bottom)
+        }
         .offset(y: dragOffset)
         .gesture(
             DragGesture()
@@ -84,8 +87,11 @@ struct SheetView: View {
             Text(value).fontWeight(.semibold).monospacedDigit()
         }
         .font(.caption)
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 6)
+        .padding(.horizontal, 4)
         .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 9))
     }
 
@@ -194,14 +200,20 @@ struct SheetView: View {
             }
             if let prof = model.profile, model.chartDistKm.count > 1 {
                 let pts = Array(zip(model.chartDistKm, prof.elevations))
+                let lo = prof.elevations.min() ?? 0
+                let hi = prof.elevations.max() ?? 1
+                let pad = max((hi - lo) * 0.08, 10)
                 Chart {
                     ForEach(pts.indices, id: \.self) { i in
                         AreaMark(x: .value("км", pts[i].0),
-                                 y: .value("м", pts[i].1))
+                                 yStart: .value("м", lo - pad),
+                                 yEnd: .value("м", pts[i].1))
+                            .interpolationMethod(.monotone)
                             .foregroundStyle(
                                 Theme.accent.opacity(0.15))
                         LineMark(x: .value("км", pts[i].0),
                                  y: .value("м", pts[i].1))
+                            .interpolationMethod(.monotone)
                             .foregroundStyle(
                                 Theme.accent)
                     }
@@ -211,7 +223,14 @@ struct SheetView: View {
                             .foregroundStyle(.primary)
                     }
                 }
-                .chartYScale(domain: .automatic(includesZero: false))
+                .chartYScale(domain: (lo - pad)...(hi + pad))
+                .chartYAxis {
+                    AxisMarks(position: .trailing,
+                              values: .automatic(desiredCount: 3))
+                }
+                .chartXAxis {
+                    AxisMarks(values: .automatic(desiredCount: 5))
+                }
                 .frame(height: 110)
                 .chartOverlay { proxy in
                     GeometryReader { geo in
