@@ -8,11 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		0971CEBD3A9E4BDA033EF9B6 /* Tiles in Resources */ = {isa = PBXBuildFile; fileRef = BB15CA97A89F93E1193E99FA /* Tiles */; };
+		32E830F4E40D66331BABD5AE /* SheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9FE68C881284943368F8A6 /* SheetView.swift */; };
 		3AD6AD7FA1FEAE6405302E79 /* TileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D65440517EBF6DAF3CCD81 /* TileStore.swift */; };
+		650DC6D335C3A320A4CABE53 /* RoutesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAEA232D219B5A8C50DB386 /* RoutesStore.swift */; };
 		6AA78B476F30ED710E94DD77 /* HikeTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */; };
+		8A1A3D2F6D76578238C5AB9F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFD4DAE5DBB0D5A1D45D172 /* OnboardingView.swift */; };
+		944FC6A141729C7F3C084057 /* Loc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1CF85DB0BC071BCD22D50A /* Loc.swift */; };
 		C9A275F78855457703D82F65 /* HikeTimeCore in Frameworks */ = {isa = PBXBuildFile; productRef = 58DB13B84775B7C23BC3221B /* HikeTimeCore */; };
 		D842CFDDA2A5D99CB6928C71 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140B4575684213D3E0515FF0 /* ContentView.swift */; };
 		E2E49AF4D5182B5CF5C95749 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82B48F709125C7612318514 /* MapView.swift */; };
+		E445B029F0DF78EA57964A53 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF397D91DE81E11C5C21D72 /* Theme.swift */; };
 		E92BC0B95D9EC829B331BF18 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = E4FFA2F1F30A6474C9C7354A /* MapLibre */; };
 		F9FC5BFDD94FC93C8DB7CCDC /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */; };
 /* End PBXBuildFile section */
@@ -20,12 +25,17 @@
 /* Begin PBXFileReference section */
 		140B4575684213D3E0515FF0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		35D65440517EBF6DAF3CCD81 /* TileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileStore.swift; sourceTree = "<group>"; };
+		4D1CF85DB0BC071BCD22D50A /* Loc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loc.swift; sourceTree = "<group>"; };
 		590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HikeTimeApp.swift; sourceTree = "<group>"; };
+		5AAEA232D219B5A8C50DB386 /* RoutesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutesStore.swift; sourceTree = "<group>"; };
 		64CE0365814A8EF1132F7EFE /* HikeTime.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HikeTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7FF397D91DE81E11C5C21D72 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		A82B48F709125C7612318514 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		BB15CA97A89F93E1193E99FA /* Tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Tiles; sourceTree = SOURCE_ROOT; };
+		CE9FE68C881284943368F8A6 /* SheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetView.swift; sourceTree = "<group>"; };
 		DA8D6EFE4E5E8E5B31889338 /* HikeTimeCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HikeTimeCore; path = ../swift/HikeTimeCore; sourceTree = SOURCE_ROOT; };
 		FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		FFFD4DAE5DBB0D5A1D45D172 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +75,12 @@
 				FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */,
 				140B4575684213D3E0515FF0 /* ContentView.swift */,
 				590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */,
+				4D1CF85DB0BC071BCD22D50A /* Loc.swift */,
 				A82B48F709125C7612318514 /* MapView.swift */,
+				FFFD4DAE5DBB0D5A1D45D172 /* OnboardingView.swift */,
+				5AAEA232D219B5A8C50DB386 /* RoutesStore.swift */,
+				CE9FE68C881284943368F8A6 /* SheetView.swift */,
+				7FF397D91DE81E11C5C21D72 /* Theme.swift */,
 				35D65440517EBF6DAF3CCD81 /* TileStore.swift */,
 			);
 			path = HikeTime;
@@ -156,7 +171,12 @@
 				F9FC5BFDD94FC93C8DB7CCDC /* AppModel.swift in Sources */,
 				D842CFDDA2A5D99CB6928C71 /* ContentView.swift in Sources */,
 				6AA78B476F30ED710E94DD77 /* HikeTimeApp.swift in Sources */,
+				944FC6A141729C7F3C084057 /* Loc.swift in Sources */,
 				E2E49AF4D5182B5CF5C95749 /* MapView.swift in Sources */,
+				8A1A3D2F6D76578238C5AB9F /* OnboardingView.swift in Sources */,
+				650DC6D335C3A320A4CABE53 /* RoutesStore.swift in Sources */,
+				32E830F4E40D66331BABD5AE /* SheetView.swift in Sources */,
+				E445B029F0DF78EA57964A53 /* Theme.swift in Sources */,
 				3AD6AD7FA1FEAE6405302E79 /* TileStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

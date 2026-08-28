@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/andreytrusov/.claude/channels/telegram/notify.sh \"✅ hiketime: Claude завершил ход и ждёт тебя\""
+          }
+        ]
+      }
+    ]
+  }
+}
