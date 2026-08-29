@@ -28,6 +28,12 @@ final class RegionStore: ObservableObject {
         return d
     }()
     var tilesDir: URL { root.appendingPathComponent("tiles/terrarium") }
+    var vectorDir: URL { root.appendingPathComponent("tiles/vector") }
+    /// есть ли распакованный векторный пакет — от этого зависит,
+    /// показывать ли подложку «Топо (оффлайн)»
+    var hasVectorTiles: Bool {
+        FileManager.default.fileExists(atPath: vectorDir.path)
+    }
     var contoursURL: URL { root.appendingPathComponent("contours.geojson") }
     private var metaURL: URL { root.appendingPathComponent("regions.json") }
 

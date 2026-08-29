@@ -10,6 +10,7 @@
 		0971CEBD3A9E4BDA033EF9B6 /* Tiles in Resources */ = {isa = PBXBuildFile; fileRef = BB15CA97A89F93E1193E99FA /* Tiles */; };
 		32E830F4E40D66331BABD5AE /* SheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9FE68C881284943368F8A6 /* SheetView.swift */; };
 		3AD6AD7FA1FEAE6405302E79 /* TileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D65440517EBF6DAF3CCD81 /* TileStore.swift */; };
+		40705AC0E631474BB8843D8D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C6A2C0EBA7CB759C6385F096 /* Assets.xcassets */; };
 		650DC6D335C3A320A4CABE53 /* RoutesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAEA232D219B5A8C50DB386 /* RoutesStore.swift */; };
 		6AA78B476F30ED710E94DD77 /* HikeTimeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */; };
 		8A1A3D2F6D76578238C5AB9F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFD4DAE5DBB0D5A1D45D172 /* OnboardingView.swift */; };
@@ -34,6 +35,7 @@
 		7FF397D91DE81E11C5C21D72 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		A82B48F709125C7612318514 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		BB15CA97A89F93E1193E99FA /* Tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Tiles; sourceTree = SOURCE_ROOT; };
+		C6A2C0EBA7CB759C6385F096 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE9FE68C881284943368F8A6 /* SheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetView.swift; sourceTree = "<group>"; };
 		DA8D6EFE4E5E8E5B31889338 /* HikeTimeCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HikeTimeCore; path = ../swift/HikeTimeCore; sourceTree = SOURCE_ROOT; };
 		FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 			isa = PBXGroup;
 			children = (
 				FBD2F4A22D26E30BABD3F1A1 /* AppModel.swift */,
+				C6A2C0EBA7CB759C6385F096 /* Assets.xcassets */,
 				140B4575684213D3E0515FF0 /* ContentView.swift */,
 				590F3BC4E8CEAB9A3078CCA8 /* HikeTimeApp.swift */,
 				4D1CF85DB0BC071BCD22D50A /* Loc.swift */,
@@ -160,6 +163,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40705AC0E631474BB8843D8D /* Assets.xcassets in Resources */,
 				0971CEBD3A9E4BDA033EF9B6 /* Tiles in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

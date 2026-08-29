@@ -79,6 +79,7 @@ final class Loc: ObservableObject {
         "Рельеф (оффлайн)": "Terrain (offline)",
         "Обычная (онлайн)": "Plain map (online)",
         "Топо (онлайн)": "Topo (online)",
+        "Топо (оффлайн)": "Topo (offline)",
         "Подложка": "Basemap",
         "Поверх": "Overlays",
         "Маршрут_секция": "Route",

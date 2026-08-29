@@ -63,6 +63,10 @@ struct MapView: UIViewRepresentable {
         let contours = docs.appendingPathComponent("contours.geojson").path
         let glyphs = Bundle.main.resourceURL!
             .appendingPathComponent("Tiles/glyphs").path
+        // векторные тайлы района, если он скачан: MapLibre читает pbf
+        // прямо из файлов, поэтому локальный сервер не нужен
+        let vectorDir = docs.appendingPathComponent("tiles/vector")
+        let hasVector = FileManager.default.fileExists(atPath: vectorDir.path)
         // слои горизонталей — из вшитого GeoJSON, посчитанного из тех же
         // terrarium-тайлов при сборке пакета (шаг 100 м, жирные каждые 500)
         let contourSource = """
@@ -87,7 +91,12 @@ struct MapView: UIViewRepresentable {
             "text-halo-color":"#ffffff","text-halo-width":1.2}}
         """
         let json: String
-        if base == "topo" {
+        if base == "vectopo" && hasVector {
+            json = Self.vectorTopoStyle(tilesPath: vectorDir.path,
+                                        demPath: res,
+                                        glyphsPath: glyphs,
+                                        contoursPath: contours)
+        } else if base == "topo" {
             json = """
             {"version":8,"sources":{"otm":{"type":"raster","tileSize":256,
             "maxzoom":17,"attribution":"© OpenTopoMap (CC-BY-SA), © OpenStreetMap",
@@ -125,6 +134,58 @@ struct MapView: UIViewRepresentable {
             .appendingPathComponent("style-\(base).json")
         try? json.data(using: .utf8)!.write(to: url)
         return url
+    }
+
+    /// Стиль оффлайн-топо: рельеф отмывкой снизу, поверх — векторные
+    /// слои OSM (вода, лес, тропы, дороги) и подписи.
+    private static func vectorTopoStyle(tilesPath: String, demPath: String,
+                                        glyphsPath: String,
+                                        contoursPath: String) -> String {
+        """
+        {"version":8,
+         "glyphs":"file://\(glyphsPath)/{fontstack}/{range}.pbf",
+         "sources":{
+           "dem":{"type":"raster-dem","encoding":"terrarium","tileSize":256,
+                  "maxzoom":12,"tiles":["file://\(demPath)/{z}/{x}/{y}.png"]},
+           "osm":{"type":"vector","maxzoom":14,
+                  "tiles":["file://\(tilesPath)/{z}/{x}/{y}.pbf"]},
+           "contours":{"type":"geojson","data":"file://\(contoursPath)"}},
+         "layers":[
+          {"id":"bg","type":"background","paint":{"background-color":"#f6f4ef"}},
+          {"id":"hills","type":"hillshade","source":"dem",
+           "paint":{"hillshade-exaggeration":0.45,
+                    "hillshade-shadow-color":"#6b6a5c",
+                    "hillshade-highlight-color":"#ffffff"}},
+          {"id":"landcover","type":"fill","source":"osm","source-layer":"landcover",
+           "paint":{"fill-color":"#d7e3cd","fill-opacity":0.45}},
+          {"id":"water","type":"fill","source":"osm","source-layer":"water",
+           "paint":{"fill-color":"#a8cfe0"}},
+          {"id":"waterway","type":"line","source":"osm","source-layer":"waterway",
+           "paint":{"line-color":"#7fb4cc","line-width":["interpolate",["linear"],["zoom"],10,0.6,15,2]}},
+          {"id":"contour-minor","type":"line","source":"contours",
+           "filter":["==",["get","major"],0],
+           "paint":{"line-color":"#a08050","line-opacity":0.4,"line-width":0.7}},
+          {"id":"contour-major","type":"line","source":"contours",
+           "filter":["==",["get","major"],1],
+           "paint":{"line-color":"#8a6d3b","line-opacity":0.6,"line-width":1.3}},
+          {"id":"contour-label","type":"symbol","source":"contours",
+           "filter":["==",["get","major"],1],
+           "layout":{"symbol-placement":"line","text-field":["to-string",["get","ele"]],
+                     "text-font":["Noto Sans Regular"],"text-size":10,"symbol-spacing":320},
+           "paint":{"text-color":"#7a5f34","text-halo-color":"#ffffff","text-halo-width":1.2}},
+          {"id":"road","type":"line","source":"osm","source-layer":"transportation",
+           "filter":["!",["in",["get","class"],["literal",["path","track"]]]],
+           "paint":{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],11,0.8,16,4]}},
+          {"id":"path","type":"line","source":"osm","source-layer":"transportation",
+           "filter":["in",["get","class"],["literal",["path","track"]]],
+           "paint":{"line-color":"#b5651d","line-width":["interpolate",["linear"],["zoom"],12,0.8,16,2],
+                    "line-dasharray":[2,1.5]}},
+          {"id":"place","type":"symbol","source":"osm","source-layer":"place",
+           "layout":{"text-field":["coalesce",["get","name:ru"],["get","name"]],
+                     "text-font":["Noto Sans Regular"],
+                     "text-size":["interpolate",["linear"],["zoom"],10,10,14,14]},
+           "paint":{"text-color":"#3c3a33","text-halo-color":"#ffffff","text-halo-width":1.4}}]}
+        """
     }
 
     // MARK: координатор

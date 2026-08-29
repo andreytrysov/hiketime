@@ -342,6 +342,12 @@ struct ContentView: View {
                      selected: model.baseLayer == "hillshade") {
                 model.baseLayer = "hillshade"
             }
+            if regions.hasVectorTiles {
+                layerRow(loc.t("Топо (оффлайн)"),
+                         selected: model.baseLayer == "vectopo") {
+                    model.baseLayer = "vectopo"
+                }
+            }
             layerRow(loc.t("Топо (онлайн)"),
                      selected: model.baseLayer == "topo") {
                 model.baseLayer = "topo"
