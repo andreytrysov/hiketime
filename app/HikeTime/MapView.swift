@@ -121,6 +121,7 @@ struct MapView: UIViewRepresentable {
             json = """
             {"version":8,"glyphs":"file://\(glyphs)/{fontstack}/{range}.pbf","sources":{"dem":{"type":"raster-dem","encoding":"terrarium",
             "tileSize":256,"maxzoom":12,
+            "attribution":"Elevation: Mapzen terrarium (AWS Open Data)",
             "tiles":["file://\(res)/{z}/{x}/{y}.png"]}\(contourSource)},
             "layers":[
               {"id":"bg","type":"background","paint":{"background-color":"#eef1ec"}},
@@ -146,8 +147,10 @@ struct MapView: UIViewRepresentable {
          "glyphs":"file://\(glyphsPath)/{fontstack}/{range}.pbf",
          "sources":{
            "dem":{"type":"raster-dem","encoding":"terrarium","tileSize":256,
-                  "maxzoom":12,"tiles":["file://\(demPath)/{z}/{x}/{y}.png"]},
+                  "maxzoom":12,"attribution":"Elevation: Mapzen terrarium (AWS Open Data)",
+                  "tiles":["file://\(demPath)/{z}/{x}/{y}.png"]},
            "osm":{"type":"vector","maxzoom":14,
+                  "attribution":"© OpenMapTiles © OpenStreetMap",
                   "tiles":["file://\(tilesPath)/{z}/{x}/{y}.pbf"]},
            "contours":{"type":"geojson","data":"file://\(contoursPath)"}},
          "layers":[
