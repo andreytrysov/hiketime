@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -105,6 +105,7 @@
 /* Begin PBXNativeTarget section */
 		2885B65840AD8DA6851E55F8 /* HikeTime */ = {
 			isa = PBXNativeTarget;
+			compatibilityVersion = "Xcode 14.0";
 			buildConfigurationList = 8BFD7B2981208E12734A1D6E /* Build configuration list for PBXNativeTarget "HikeTime" */;
 			buildPhases = (
 				E32BD03C73A582E63EE2A3E0 /* Sources */,
@@ -143,12 +144,10 @@
 				en,
 			);
 			mainGroup = 5ABF9F78448FAECD3E94BFC6;
-			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				08FE835A2171C262FAC3DC1D /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */,
 				DDB192C443B31AF93882533C /* XCLocalSwiftPackageReference "../swift/HikeTimeCore" */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = EB60473638F299D1AF2C05DB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
