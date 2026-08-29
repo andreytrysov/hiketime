@@ -48,8 +48,7 @@ actor TileStore {
         if let data = try? Data(contentsOf: file), let t = DEM.Tile(pngData: data) {
             return t
         }
-        let url = URL(string:
-            "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/\(key.z)/\(key.x)/\(key.y).png")!
+        let url = RegionStore.terrariumURL(z: key.z, x: key.x, y: key.y)
         let (data, resp) = try await session.data(from: url)
         guard (resp as? HTTPURLResponse)?.statusCode == 200,
               let tile = DEM.Tile(pngData: data) else {

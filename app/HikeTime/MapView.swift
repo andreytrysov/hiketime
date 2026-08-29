@@ -54,6 +54,18 @@ struct MapView: UIViewRepresentable {
     /// Стиль: отмывка рельефа из вшитых terrarium-тайлов — оффлайн,
     /// без сети и VPN, и легально (AWS Open Data, массовая выгрузка разрешена).
     /// OSM-растр в пакет класть нельзя — их политика запрещает выкачивание.
+    /// Адрес источника с учётом отладочного прокси.
+    private static func remote(_ source: String, _ path: String) -> String {
+        if let p = RegionStore.proxyBase { return "\(p)/\(source)/\(path)" }
+        switch source {
+        case "otm": return "https://tile.opentopomap.org/\(path)"
+        case "osm": return "https://tile.openstreetmap.org/\(path)"
+        default:
+            return "https://server.arcgisonline.com/ArcGIS/rest/services/"
+                 + "World_Imagery/MapServer/tile/\(path)"
+        }
+    }
+
     private static func styleURL(base: String) -> URL {
         // тайлы и горизонтали живут в Documents: туда их кладут
         // скачанные районы (вшитый демо-район переносится при первом запуске)
@@ -100,21 +112,21 @@ struct MapView: UIViewRepresentable {
             json = """
             {"version":8,"sources":{"otm":{"type":"raster","tileSize":256,
             "maxzoom":17,"attribution":"© OpenTopoMap (CC-BY-SA), © OpenStreetMap",
-            "tiles":["https://tile.opentopomap.org/{z}/{x}/{y}.png"]}},
+            "tiles":["\(remote("otm", "{z}/{x}/{y}.png"))"]}},
             "layers":[{"id":"otm","type":"raster","source":"otm"}]}
             """
         } else if base == "plain" {
             json = """
             {"version":8,"sources":{"osm":{"type":"raster","tileSize":256,
             "maxzoom":19,"attribution":"© OpenStreetMap",
-            "tiles":["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]}},
+            "tiles":["\(remote("osm", "{z}/{x}/{y}.png"))"]}},
             "layers":[{"id":"osm","type":"raster","source":"osm"}]}
             """
         } else if base == "satellite" {
             json = """
             {"version":8,"glyphs":"file://\(glyphs)/{fontstack}/{range}.pbf","sources":{"sat":{"type":"raster","tileSize":256,
             "maxzoom":18,"attribution":"Esri",
-            "tiles":["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"]}\(contourSource)},
+            "tiles":["\(remote("sat", "{z}/{y}/{x}"))"]}\(contourSource)},
             "layers":[{"id":"sat","type":"raster","source":"sat"}\(contourLayers)]}
             """
         } else {

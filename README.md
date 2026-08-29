@@ -126,3 +126,16 @@ Python-прототипом (см. Fixtures/). XCTest-набор заведёт�
 
 Локальный HTTP-сервер не нужен: MapLibre iOS читает и растровые, и
 векторные тайлы напрямую по `file://`.
+
+# Разработка при включённом VPN
+
+Симулятор не резолвит внешние имена, когда на маке поднят VPN (DNS
+уходит в туннель). Сам мак при этом ходит в сеть нормально. Обход —
+прокси тайлов на localhost:
+
+    ./.venv/bin/python tools/tileproxy.py
+    xcrun simctl spawn booted defaults write com.andreytrusov.hiketime \
+        tileProxyBase -string "http://localhost:8790"
+
+Ключа нет — приложение ходит по боевым адресам напрямую. На реальном
+устройстве прокси не нужен и не включается.

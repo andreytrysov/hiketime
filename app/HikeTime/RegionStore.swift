@@ -22,6 +22,21 @@ final class RegionStore: ObservableObject {
 
     static let zoom = 12                    // выше DEM не детальнее
 
+    /// Отладочный прокси: Симулятор не резолвит внешние имена, когда на
+    /// маке поднят VPN. Если ключ задан — ходим через localhost.
+    /// В обычной сборке ключа нет и адреса остаются боевыми.
+    nonisolated static var proxyBase: String? {
+        UserDefaults.standard.string(forKey: "tileProxyBase")
+    }
+
+    nonisolated static func terrariumURL(z: Int, x: Int, y: Int) -> URL {
+        if let p = proxyBase {
+            return URL(string: "\(p)/terrarium/\(z)/\(x)/\(y).png")!
+        }
+        return URL(string:
+            "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/\(z)/\(x)/\(y).png")!
+    }
+
     private let root: URL = {
         let d = FileManager.default.urls(for: .documentDirectory,
                                          in: .userDomainMask)[0]
@@ -144,7 +159,7 @@ final class RegionStore: ObservableObject {
             let dir = tilesDir.appendingPathComponent("\(t.z)/\(t.x)")
             let file = dir.appendingPathComponent("\(t.y).png")
             if !fm.fileExists(atPath: file.path) {
-                let url = URL(string: "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/\(key).png")!
+                let url = Self.terrariumURL(z: t.z, x: t.x, y: t.y)
                 do {
                     let (data, resp) = try await URLSession.shared.data(from: url)
                     guard (resp as? HTTPURLResponse)?.statusCode == 200 else {
