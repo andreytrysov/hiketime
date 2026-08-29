@@ -105,3 +105,24 @@ Python-прототипом (см. Fixtures/). XCTest-набор заведёт�
 `routes.py` — 11 маршрутов (Альпы, Норвегия, Шотландия, Уэльс),
 `run.py` — геометрия по тропам из OSM (Overpass + Дейкстра) и профили,
 `fit.py` — подгонка power_per_kg и сравнение с классикой.
+
+# Оффлайн-топо (векторные тайлы)
+
+Собирается на Маке один раз на район, кладётся в бандл или скачивается:
+
+    JAVA=/opt/homebrew/Cellar/openjdk/*/bin/java
+    $JAVA -Xmx4g -jar planetiler.jar --download --area=switzerland \
+        --bounds=7.55,45.90,7.90,46.15 --minzoom=8 --maxzoom=14 \
+        --output=zermatt.mbtiles --force
+    ./.venv/bin/python tools/extract_mbtiles.py zermatt.mbtiles app/Tiles/vector
+
+Район Церматта: 416 тайлов, 4.6 МБ.
+
+Два подводных камня, оба уже учтены в `tools/extract_mbtiles.py`:
+- mbtiles хранит тайлы в схеме TMS (ось Y снизу), MapLibre ждёт XYZ;
+- тайлы гзипованы. По HTTP их распаковывает транспорт, а при чтении
+  по `file://` MapLibre получает сырые байты и молча ничего не рисует —
+  поэтому гзип снимаем при распаковке.
+
+Локальный HTTP-сервер не нужен: MapLibre iOS читает и растровые, и
+векторные тайлы напрямую по `file://`.

@@ -95,6 +95,16 @@ final class RegionStore: ObservableObject {
            !FileManager.default.fileExists(atPath: contoursURL.path) {
             try? FileManager.default.copyItem(at: src, to: contoursURL)
         }
+        // векторный пакет демо-района — туда же
+        if let src = Bundle.main.resourceURL?
+            .appendingPathComponent("Tiles/vector"),
+           FileManager.default.fileExists(atPath: src.path),
+           !FileManager.default.fileExists(atPath: vectorDir.path) {
+            try? FileManager.default.createDirectory(
+                at: vectorDir.deletingLastPathComponent(),
+                withIntermediateDirectories: true)
+            try? FileManager.default.copyItem(at: src, to: vectorDir)
+        }
     }
 
     // MARK: скачивание

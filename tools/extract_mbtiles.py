@@ -2,10 +2,11 @@
 """mbtiles -> дерево z/x/y.pbf, которое MapLibre читает по file://
 
 Planetiler кладёт тайлы в SQLite в схеме TMS (ось Y снизу), а MapLibre
-ждёт XYZ (сверху) — при распаковке переворачиваем. Гзип не трогаем:
-MapLibre узнаёт его по сигнатуре и распаковывает сам.
+ждёт XYZ (сверху) — при распаковке переворачиваем. Гзип снимаем: по
+HTTP его распаковывает транспорт (Content-Encoding), а при чтении
+по file:// MapLibre получает сырые байты и молча их не разбирает.
 """
-import argparse, os, sqlite3, sys
+import argparse, gzip, os, sqlite3, sys
 
 
 def main():
@@ -27,6 +28,8 @@ def main():
         d = os.path.join(a.outdir, str(z), str(x))
         os.makedirs(d, exist_ok=True)
         path = os.path.join(d, f"{y}.pbf")
+        if data[:2] == b"\x1f\x8b":
+            data = gzip.decompress(data)
         with open(path, "wb") as f:
             f.write(data)
         n += 1

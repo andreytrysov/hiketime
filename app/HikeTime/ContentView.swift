@@ -364,7 +364,8 @@ struct ContentView: View {
             Text(loc.t("Поверх").uppercased())
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-            if model.baseLayer == "hillshade" || model.baseLayer == "satellite" {
+            if model.baseLayer == "hillshade" || model.baseLayer == "satellite"
+                || model.baseLayer == "vectopo" {
                 layerRow(loc.t("Линии высот"),
                          selected: model.contours) {
                     model.contours.toggle()
