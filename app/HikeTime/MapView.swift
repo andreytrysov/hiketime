@@ -32,8 +32,10 @@ struct MapView: UIViewRepresentable {
         // в режиме рисования карта не таскается одним пальцем
         map.allowsScrolling = !model.drawMode
         let wantURL = Self.styleURL(base: model.baseLayer)
-        if context.coordinator.currentBase != model.baseLayer {
+        if context.coordinator.currentBase != model.baseLayer
+            || context.coordinator.styleGeneration != model.styleGeneration {
             context.coordinator.currentBase = model.baseLayer
+            context.coordinator.styleGeneration = model.styleGeneration
             context.coordinator.resetStyle()
             map.styleURL = wantURL
         }
@@ -53,10 +55,12 @@ struct MapView: UIViewRepresentable {
     /// без сети и VPN, и легально (AWS Open Data, массовая выгрузка разрешена).
     /// OSM-растр в пакет класть нельзя — их политика запрещает выкачивание.
     private static func styleURL(base: String) -> URL {
-        let res = Bundle.main.resourceURL!
-            .appendingPathComponent("Tiles/terrarium").path
-        let contours = Bundle.main.resourceURL!
-            .appendingPathComponent("Tiles/contours.geojson").path
+        // тайлы и горизонтали живут в Documents: туда их кладут
+        // скачанные районы (вшитый демо-район переносится при первом запуске)
+        let docs = FileManager.default.urls(for: .documentDirectory,
+                                            in: .userDomainMask)[0]
+        let res = docs.appendingPathComponent("tiles/terrarium").path
+        let contours = docs.appendingPathComponent("contours.geojson").path
         let glyphs = Bundle.main.resourceURL!
             .appendingPathComponent("Tiles/glyphs").path
         // слои горизонталей — из вшитого GeoJSON, посчитанного из тех же
@@ -135,6 +139,7 @@ struct MapView: UIViewRepresentable {
         private var previewSource: MLNShapeSource?
         var lastFit = 0
         var currentBase = ""
+        var styleGeneration = -1
 
         func resetStyle() {
             styleReady = false
@@ -254,12 +259,24 @@ struct MapView: UIViewRepresentable {
             spd.shape = MLNShapeCollectionFeature(shapes: feats)
         }
 
+        func mapView(_ mapView: MLNMapView, regionDidChangeAnimated: Bool) {
+            let b = mapView.visibleCoordinateBounds
+            model.visibleBounds = (b.sw.latitude, b.sw.longitude,
+                                   b.ne.latitude, b.ne.longitude)
+        }
+
         func fitToRoute() {
-            guard let map, model.path.count >= 2 else { return }
+            guard let map else { return }
             var minLat = 90.0, maxLat = -90.0, minLon = 180.0, maxLon = -180.0
-            for p in model.path {
-                minLat = min(minLat, p.lat); maxLat = max(maxLat, p.lat)
-                minLon = min(minLon, p.lon); maxLon = max(maxLon, p.lon)
+            if let b = model.fitBounds {
+                (minLat, minLon, maxLat, maxLon) = (b.minLat, b.minLon, b.maxLat, b.maxLon)
+                model.fitBounds = nil
+            } else {
+                guard model.path.count >= 2 else { return }
+                for p in model.path {
+                    minLat = min(minLat, p.lat); maxLat = max(maxLat, p.lat)
+                    minLon = min(minLon, p.lon); maxLon = max(maxLon, p.lon)
+                }
             }
             let bounds = MLNCoordinateBounds(
                 sw: CLLocationCoordinate2D(latitude: minLat, longitude: minLon),

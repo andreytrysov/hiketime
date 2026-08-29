@@ -5,8 +5,12 @@ struct ContentView: View {
     @EnvironmentObject var model: AppModel
     @StateObject private var loc = Loc()
     @StateObject private var store = RoutesStore()
+    @StateObject private var regions = RegionStore()
+    @State private var regionName = ""
+    @State private var askRegionName = false
+    @State private var deleteRegion: Region?
 
-    enum Panel { case none, routes, settings, layers }
+    enum Panel { case none, routes, settings, layers, regions }
     @State private var panel: Panel = .none
 
     @State private var askName = false
@@ -42,6 +46,7 @@ struct ContentView: View {
                 if panel == .routes { routesPanel }
                 if panel == .settings { settingsPanel }
                 if panel == .layers { layersPanel }
+                if panel == .regions { regionsPanel }
             }
             .transition(.opacity.combined(with: .scale(scale: 0.96)))
             .animation(.easeOut(duration: 0.15), value: panel)
@@ -93,6 +98,32 @@ struct ContentView: View {
         .alert(loc.t("Стереть нарисованный маршрут?"), isPresented: $askClear) {
             Button(loc.t("Стереть"), role: .destructive) { model.clear() }
             Button(loc.t("Отмена"), role: .cancel) {}
+        }
+        .alert(loc.t("Название района"), isPresented: $askRegionName) {
+            TextField(loc.t("Район"), text: $regionName)
+            Button(loc.t("Скачать")) {
+                guard let b = model.visibleBounds else { return }
+                let name = regionName.trimmingCharacters(in: .whitespaces)
+                panel = .none
+                Task {
+                    await regions.download(
+                        name: name.isEmpty ? loc.t("Район") : name,
+                        minLat: b.minLat, minLon: b.minLon,
+                        maxLat: b.maxLat, maxLon: b.maxLon)
+                    model.styleGeneration += 1
+                }
+            }
+            Button(loc.t("Отмена"), role: .cancel) {}
+        }
+        .alert(loc.f("Удалить «%@»?", deleteRegion?.name ?? ""),
+               isPresented: .init(get: { deleteRegion != nil },
+                                  set: { if !$0 { deleteRegion = nil } })) {
+            Button(loc.t("Удалить"), role: .destructive) {
+                if let r = deleteRegion { regions.delete(r) }
+                deleteRegion = nil
+                model.styleGeneration += 1
+            }
+            Button(loc.t("Отмена"), role: .cancel) { deleteRegion = nil }
         }
         .alert(loc.f("Удалить «%@»?", deleteCandidate?.name ?? ""),
                isPresented: .init(get: { deleteCandidate != nil },
@@ -265,6 +296,23 @@ struct ContentView: View {
             }
             Divider()
             Button {
+                panel = .regions
+            } label: {
+                HStack {
+                    Text(loc.t("Оффлайн-карты"))
+                        .font(.subheadline)
+                    Spacer()
+                    Text(sizeText(regions.totalBytes))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .foregroundStyle(.primary)
+                .padding(.vertical, 6)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            Divider()
+            Button {
                 panel = .none
                 showOnboarding = true
             } label: {
@@ -366,6 +414,109 @@ struct ContentView: View {
                 .padding(.vertical, 5)
             }
         }
+    }
+
+    private func sizeText(_ bytes: Int) -> String {
+        bytes < 1_000_000
+            ? "\(bytes / 1000) \(loc.t("единица_КБ"))"
+            : String(format: "%.1f %@", Double(bytes) / 1_000_000,
+                     loc.t("единица_МБ"))
+    }
+
+    private var regionsPanel: some View {
+        PanelCard(alignment: .topLeading) {
+            Text(loc.t("Оффлайн-карты").uppercased())
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+
+            if let p = regions.progress {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(loc.t("Скачиваю…"))
+                        .font(.subheadline)
+                    ProgressView(value: p)
+                        .tint(Theme.accent)
+                }
+                .padding(.vertical, 4)
+            } else {
+                let plan = currentPlan
+                Button {
+                    regionName = ""
+                    askRegionName = true
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(loc.t("Скачать видимую область"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(plan.count > 400 ? .secondary : Theme.accent)
+                        Text(plan.count > 400
+                             ? loc.t("Слишком большая область — приблизьте карту")
+                             : String(format: "%d %@ · ~%.1f %@", plan.count,
+                                      loc.t("тайлов"), plan.estimateMB,
+                                      loc.t("единица_МБ")))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(plan.count > 400 || plan.count == 0)
+            }
+
+            if let e = regions.lastError {
+                Text(e)
+                    .font(.caption2)
+                    .foregroundStyle(Theme.danger)
+            }
+
+            Divider()
+            if regions.regions.isEmpty {
+                Text(loc.t("Пока нет скачанных районов"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 6)
+            } else {
+                ForEach(regions.regions) { r in
+                    HStack {
+                        Button {
+                            model.fitBounds = (r.minLat, r.minLon, r.maxLat, r.maxLon)
+                            model.fitRequest += 1
+                            panel = .none
+                        } label: {
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(r.name)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.primary)
+                                    .lineLimit(1)
+                                Text("\(r.tiles.count) \(loc.t("тайлов")) · \(sizeText(r.bytes))")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        Button {
+                            deleteRegion = r
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Theme.danger)
+                                .padding(6)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.vertical, 5)
+                }
+            }
+        }
+    }
+
+    private var currentPlan: RegionStore.Plan {
+        guard let b = model.visibleBounds else {
+            return RegionStore.Plan(tiles: [])
+        }
+        return RegionStore.plan(minLat: b.minLat, minLon: b.minLon,
+                                maxLat: b.maxLat, maxLon: b.maxLon)
     }
 
     private func layerRow(_ text: String, selected: Bool,

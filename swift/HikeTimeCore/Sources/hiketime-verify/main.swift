@@ -165,5 +165,64 @@ let simp = RouteEditing.simplify(zig, tolerance: 5)
 check(simp.first == zig.first && simp.last == zig.last && simp.count < zig.count,
       "упрощение держит концы и убирает шум")
 
+print("горизонтали (marching squares):")
+// конус: высота = 1000 - расстояние от центра; линии должны быть замкнутыми кольцами
+var cone = [Double]()
+let N = 60
+for y in 0..<N {
+    for x in 0..<N {
+        let dx = Double(x - N/2), dy = Double(y - N/2)
+        cone.append(1000 - (dx*dx + dy*dy).squareRoot() * 20)
+    }
+}
+let lines = Contours.build(grid: .init(values: cone, width: N, height: N),
+                           step: 100, majorEvery: 500)
+check(!lines.isEmpty, "линии построены: \(lines.count)")
+check(lines.allSatisfy { $0.points.count >= 3 }, "все линии содержательны")
+check(lines.contains { $0.major }, "есть жирные (кратные 500)")
+// сравниваем кольца, целиком лежащие внутри сетки: у конуса
+// нижние горизонтали обрезаны краем и потому короткие
+let byEle = Dictionary(grouping: lines.filter { $0.elevation >= 600 },
+                       by: { $0.elevation })
+    .mapValues { ls -> Double in
+        var total = 0.0
+        for l in ls {
+            for i in 1..<l.points.count {
+                let dx = l.points[i].0 - l.points[i-1].0
+                let dy = l.points[i].1 - l.points[i-1].1
+                total += (dx*dx + dy*dy).squareRoot()
+            }
+        }
+        return total
+    }
+let sorted = byEle.sorted { $0.key < $1.key }
+if sorted.count >= 2 {
+    check(sorted.first!.value > sorted.last!.value,
+          "кольца сужаются к вершине: \(Int(sorted.first!.value)) -> \(Int(sorted.last!.value))")
+    check(sorted.count >= 3, "внутренних уровней: \(sorted.count)")
+}
+
+print("тайловая арифметика (пакеты районов):")
+// те же формулы, что в RegionStore — сверяем с Python-эталоном проекта
+func tileIndex(lat: Double, lon: Double, z: Int) -> (Int, Int) {
+    let n = pow(2.0, Double(z))
+    let x = Int((lon + 180) / 360 * n)
+    let latRad = lat * .pi / 180
+    let y = Int((1 - log(tan(latRad) + 1 / cos(latRad)) / .pi) / 2 * n)
+    return (x, y)
+}
+// Шварцзее (45.9824, 7.7025) на z12 должен попасть в тайл 2135/1457 —
+// именно его мы выгружали для фикстур
+let t = tileIndex(lat: 45.9824, lon: 7.7025, z: 12)
+check(t.0 == 2135 && t.1 == 1457, "тайл Шварцзее z12: \(t.0)/\(t.1)")
+
+// прямоугольник района: сколько тайлов покрывает 0.1° около Церматта
+let cornerNW = tileIndex(lat: 46.05, lon: 7.65, z: 12)
+let cornerSE = tileIndex(lat: 45.95, lon: 7.75, z: 12)
+let cols = abs(cornerSE.0 - cornerNW.0) + 1
+let rows = abs(cornerSE.1 - cornerNW.1) + 1
+check(cols * rows >= 4 && cols * rows <= 20,
+      "0.1° около Церматта = \(cols)x\(rows) тайлов")
+
 print(failed == 0 ? "\nВСЕ ПРОВЕРКИ ПРОЙДЕНЫ" : "\nПРОВАЛЕНО: \(failed)")
 exit(failed == 0 ? 0 : 1)

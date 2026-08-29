@@ -59,6 +59,8 @@ final class Loc: ObservableObject {
         "единица_км": "km",
         "единица_м": "m",
         "единица_кмч": "km/h",
+        "единица_КБ": "KB",
+        "единица_МБ": "MB",
         "Дальше": "Next",
         "Начать": "Start",
         "Пропустить": "Skip",
@@ -86,6 +88,15 @@ final class Loc: ObservableObject {
         "Поделиться текущим маршрутом": "Share current route",
         "Импортировать GPX": "Import GPX",
         "по треку": "recorded",
+        "Оффлайн-карты": "Offline maps",
+        "Скачать видимую область": "Download visible area",
+        "Слишком большая область — приблизьте карту": "Area too large — zoom in",
+        "Пока нет скачанных районов": "No downloaded areas yet",
+        "тайлов": "tiles",
+        "Скачиваю…": "Downloading…",
+        "Название района": "Area name",
+        "Район": "Area",
+        "Скачать": "Download",
         "модель": "model",
         "Не удалось прочитать GPX": "Could not read the GPX file",
         "Спутник (онлайн)": "Satellite (online)",
@@ -112,6 +123,7 @@ final class Loc: ObservableObject {
 
     private static let ruUnits: [String: String] = [
         "единица_км": "км", "единица_м": "м", "единица_кмч": "км/ч",
+        "единица_КБ": "КБ", "единица_МБ": "МБ",
     ]
 
     func t(_ key: String) -> String {

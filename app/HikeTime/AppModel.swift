@@ -39,6 +39,14 @@ final class AppModel: ObservableObject {
     @Published var followUser = false
     /// счётчик запросов «подлететь к маршруту»
     @Published var fitRequest = 0
+    /// растёт, когда меняются оффлайн-данные — заставляет карту перечитать стиль
+    @Published var styleGeneration = 0
+    /// текущая видимая область карты — из неё качаем район
+    @Published var visibleBounds: (minLat: Double, minLon: Double,
+                                   maxLat: Double, maxLon: Double)?
+    /// куда лететь по fitRequest; nil — к маршруту
+    @Published var fitBounds: (minLat: Double, minLon: Double,
+                               maxLat: Double, maxLon: Double)?
 
     // режимы
     @Published var drawMode = false

@@ -48,7 +48,7 @@ public enum DEM {
             self.elevations = elev
         }
 
-        func at(_ px: Int, _ py: Int) -> Double {
+        public func at(_ px: Int, _ py: Int) -> Double {
             elevations[py * 256 + px]
         }
     }
