@@ -21,6 +21,7 @@ struct SheetView: View {
 
             VStack(spacing: 10) {
                 chips
+                recordedRow
                 weightBlock
                 selectsRow
                 if position == .full {
@@ -77,6 +78,26 @@ struct SheetView: View {
             if model.lunch {
                 chip("", loc.t("обед 30 мин"))
             }
+        }
+    }
+
+    /// Сравнение с фактом из GPX — видно, врёт модель или нет.
+    @ViewBuilder private var recordedRow: some View {
+        if let (fact, err) = model.recordedComparison(loc) {
+            HStack(spacing: 6) {
+                Text(loc.t("по треку"))
+                    .foregroundStyle(.secondary)
+                Text(fact)
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+                Text("· \(loc.t("модель")) \(err)")
+                    .foregroundStyle(.secondary)
+            }
+            .font(.caption)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 7)
+            .background(Theme.accent.opacity(0.10),
+                        in: RoundedRectangle(cornerRadius: 9))
         }
     }
 

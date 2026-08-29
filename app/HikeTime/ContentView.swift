@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var draftName = ""
     @State private var askClear = false
     @State private var deleteCandidate: SavedRoute?
+    @State private var showImporter = false
     @State private var showOnboarding = false
     @AppStorage("onboarded") private var onboarded = false
 
@@ -62,6 +63,18 @@ struct ContentView: View {
             }
         }
         .environmentObject(loc)
+        .fileImporter(isPresented: $showImporter,
+                      allowedContentTypes: [.init(filenameExtension: "gpx") ?? .xml,
+                                            .xml]) { result in
+            if case .success(let url) = result {
+                model.importGPX(from: url)
+            }
+        }
+        .onOpenURL { url in
+            if url.pathExtension.lowercased() == "gpx" {
+                model.importGPX(from: url)
+            }
+        }
         .sheet(isPresented: $showOnboarding) {
             OnboardingView()
                 .environmentObject(loc)
@@ -189,6 +202,17 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 Divider()
             }
+            Button {
+                panel = .none
+                showImporter = true
+            } label: {
+                Text(loc.t("Импортировать GPX"))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.accent)
+                    .padding(.vertical, 6)
+            }
+            .buttonStyle(.plain)
+            Divider()
             Text(loc.t("Мои маршруты").uppercased())
                 .font(.caption2)
                 .foregroundStyle(.secondary)

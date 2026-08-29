@@ -20,6 +20,10 @@ final class AppModel: ObservableObject {
     @AppStorage("power") var power: Double = 3.6 { didSet { recomputeTime() } }
     @AppStorage("terrain") var terrain: Double = 1.0 { didSet { recomputeTime() } }
 
+    /// Фактическое ходовое время из импортированного трека — прямая
+    /// проверка модели: показываем рядом с расчётом.
+    @Published var recordedHours: Double?
+
     // сохранение
     @Published var routeName: String?
     @Published var savedId: Double?
@@ -80,6 +84,7 @@ final class AppModel: ObservableObject {
         history.append(path)
         if history.count > 40 { history.removeFirst() }
         savedId = nil                     // маршрут изменился
+        recordedHours = nil               // трек правили — факт больше не про него
     }
 
     func undo() {
@@ -94,6 +99,7 @@ final class AppModel: ObservableObject {
         profile = nil
         routeName = nil
         savedId = nil
+        recordedHours = nil
         totalText = "—"
         movingHoursText = ""; statsText = ""
         shortBreaks = 0; lunch = false; sensMinutes = 0
@@ -103,6 +109,29 @@ final class AppModel: ObservableObject {
     }
 
     // MARK: расчёт
+
+    /// Импорт GPX: путь упрощается до редактируемого размера,
+    /// метки времени (если есть) показываются тостом — это данные
+    /// для сверки модели с фактом.
+    func importGPX(from url: URL) {
+        let secured = url.startAccessingSecurityScopedResource()
+        defer { if secured { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url),
+              let track = GPX.parse(data), track.points.count >= 2 else {
+            toast("Не удалось прочитать GPX")
+            return
+        }
+        typealias P = RouteEditing.P
+        let simplified = RouteEditing.simplify(
+            track.points.map { P($0.lon, $0.lat) }, tolerance: 0.0001)
+        path = simplified.map { GeoPoint(lat: $0.y, lon: $0.x) }
+        history = []
+        routeName = url.deletingPathExtension().lastPathComponent
+        savedId = nil
+        recomputeProfile()
+        fitRequest += 1
+        recordedHours = track.movingHours()
+    }
 
     func recomputeProfile() {
         guard path.count >= 2 else { return }
@@ -184,6 +213,16 @@ final class AppModel: ObservableObject {
         let km = loc.t("единица_км"), m = loc.t("единица_м")
         return String(format: "%.1f %@ · ↑%.0f %@ · ↓%.0f %@",
                       prof.distM / 1000, km, prof.gainM, m, prof.lossM, m)
+    }
+
+    /// «по треку 2:08 · модель −6%» — насколько мы попали.
+    func recordedComparison(_ loc: Loc) -> (String, String)? {
+        guard let rec = recordedHours, let prof = profile, rec > 0 else { return nil }
+        let model = EnergyModel(bodyKg: bodyKg, loadKg: loadKg,
+                                powerPerKg: power, terrain: terrain)
+            .timeHours(prof.segments)
+        let err = (model - rec) / rec * 100
+        return (Self.fmt(rec), String(format: "%+.0f%%", err))
     }
 
     func breaksLocalized(_ loc: Loc) -> String {
